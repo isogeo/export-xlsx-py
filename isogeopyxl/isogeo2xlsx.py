@@ -1,16 +1,10 @@
 # -*- coding: UTF-8 -*-
 #! python3
 
-# ------------------------------------------------------------------------------
-# Name:         Isogeo to Microsoft Excel 2010
-# Purpose:      Get metadatas from an Isogeo share and store it into
-#               a Excel worksheet. It's one of the submodules of
-#               isogeo2office (https://github.com/isogeo/isogeo-2-office).
-#
-# Author:       Isogeo
-#
-# Python:       3.7+
-# ------------------------------------------------------------------------------
+"""
+    Get metadatas from Isogeo and store it into a Excel worksheet. 
+
+"""
 
 # ##############################################################################
 # ########## Libraries #############
@@ -21,15 +15,22 @@ import logging
 from collections import Counter
 from collections.abc import KeysView
 from pathlib import Path
+from urllib.parse import urlparse
 
 # 3rd party library
-from isogeo_pysdk import IsogeoTranslator, Metadata, Share, IsogeoUtils
+from isogeo_pysdk import IsogeoTranslator, IsogeoUtils, Metadata, Share
 from openpyxl import Workbook
-from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.styles import Alignment, NamedStyle
 from openpyxl.utils import get_column_letter
+from openpyxl.worksheet.worksheet import Worksheet
 
 # custom submodules
+from isogeopyxl.matrix import (
+    RASTER_COLUMNS,
+    RESOURCE_COLUMNS,
+    SERVICE_COLUMNS,
+    VECTOR_COLUMNS,
+)
 from isogeopyxl.utils import Formatter, Stats
 
 # ##############################################################################
@@ -485,8 +486,18 @@ class Isogeo2xlsx(Workbook):
             ws["{}{}".format(colsref.get("abstract"), idx)] = md.abstract
 
         # path to source
-        if md.path and md.type != "service":
+        try:
             src_path = Path(str(md.path))
+        except OSError as e:
+            logger.debug(
+                "Metadata.path value is not a valid system path. Maybe an URL? Original error: {}".format(
+                    e
+                )
+            )
+            print(urlparse(md.path).scheme)
+            urlparse(md.path).scheme != ""
+
+        if isinstance(md.path, Path) and md.type != "service":
             if src_path.is_file():
                 link_path = r'=HYPERLINK("{0}","{1}")'.format(
                     src_path.parent, src_path.resolve()

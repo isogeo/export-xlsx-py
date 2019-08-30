@@ -50,7 +50,7 @@ class Stats(object):
     def __init__(self, lang=None):
         """Instanciate stats class."""
         # self._ = _
-        super(IsogeoStats, self).__init__()
+        super(Stats, self).__init__()
 
     def fillfull(self):
         """Calculate fields fillfull level."""
@@ -161,7 +161,7 @@ if __name__ == "__main__":
     # ws = wb.active
 
     # this app
-    app = IsogeoStats()
+    app = Stats()
     # app.week_work(search.get("results"))
     # print(type(app.fillfull()))
 

@@ -22,8 +22,14 @@ import logging
 from urllib.parse import urlparse
 
 # 3rd party library
-from isogeo_pysdk import (Condition, IsogeoTranslator, IsogeoUtils, License,
-                          Limitation, Specification)
+from isogeo_pysdk import (
+    Condition,
+    IsogeoTranslator,
+    IsogeoUtils,
+    License,
+    Limitation,
+    Specification,
+)
 
 # ##############################################################################
 # ############ Globals ############
@@ -84,12 +90,12 @@ class Formatter(object):
             cgu_out = {}
             # load condition object
             condition_in = Condition(**c_in)
-            cgu_out["description"] = utils.clean_xml(condition_in.description, "")
+            cgu_out["description"] = condition_in.description
             if isinstance(condition_in.license, License):
                 lic = condition_in.license
-                cgu_out["name"] = utils.clean_xml(lic.name)
+                cgu_out["name"] = lic.name
                 cgu_out["link"] = lic.link
-                cgu_out["content"] = utils.clean_xml(lic.content)
+                cgu_out["content"] = lic.content
             else:
                 cgu_out["name"] = self.isogeo_tr("conditions", "noLicense")
 
@@ -114,7 +120,7 @@ class Formatter(object):
         for l_in in md_limitations:
             limitation = {}
             # ensure other fields
-            limitation["description"] = utils.clean_xml(l_in.get("description", ""))
+            limitation["description"] = l_in.get("description", "")
             limitation["type"] = self.isogeo_tr("limitations", l_in.get("type"))
             # legal type
             if l_in.get("type") == "legal":
@@ -125,12 +131,10 @@ class Formatter(object):
                 pass
             # INSPIRE precision
             if "directive" in l_in.keys():
-                limitation["inspire"] = utils.clean_xml(
-                    l_in.get("directive").get("name")
-                )
-                limitation["content"] = utils.clean_xml(
-                    l_in.get("directive").get("description")
-                )
+                limitation["inspire"] = l_in.get("directive").get("name")
+
+                limitation["content"] = l_in.get("directive").get("description")
+
             else:
                 pass
 
@@ -196,4 +200,4 @@ class Formatter(object):
 # ###################################
 if __name__ == "__main__":
     """Try me"""
-    formatter = IsogeoFormatter()
+    formatter = Formatter()
