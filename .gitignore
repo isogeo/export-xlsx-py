@@ -64,6 +64,7 @@ instance/
 .scrapy
 
 # Sphinx documentation
+docs/_apidoc/
 docs/_build/
 
 # PyBuilder
@@ -139,3 +140,4 @@ junit/*
 *_wip*
 *.xlsx
 
+tests/fixtures/api_search_*.json
