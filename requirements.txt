@@ -26,3 +26,4 @@ pre-commit
 pylint
 pytest-cov
 python-dotenv
+sphinx
