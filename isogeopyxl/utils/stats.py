@@ -20,12 +20,10 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 # Standard library
 from collections import Counter, defaultdict
-import gettext
 import logging
 
 # 3rd party library
-from openpyxl.chart import BarChart, PieChart, Reference
-from openpyxl.chart.series import DataPoint
+from openpyxl.chart import BarChart, Reference
 
 
 # ##############################################################################
@@ -63,33 +61,33 @@ class Stats(object):
 
         return "weekly baby!"
 
-    def type_pie(self, sheet, total=20):
-        """Return histogram data to represent cataloging activity per week."""
-        data = (
-            (_("Type"), _("Count")),
-            (_("Vector"), self.md_types_repartition.get("vector", 0)),
-            (_("Raster"), self.md_types_repartition.get("raster", 0)),
-            (_("Service"), self.md_types_repartition.get("service", 0)),
-            (_("Resource"), self.md_types_repartition.get("resource", 0)),
-        )
+    # def type_pie(self, sheet, total=20):
+    #     """Return histogram data to represent cataloging activity per week."""
+    #     data = (
+    #         (_("Type"), _("Count")),
+    #         (_("Vector"), self.md_types_repartition.get("vector", 0)),
+    #         (_("Raster"), self.md_types_repartition.get("raster", 0)),
+    #         (_("Service"), self.md_types_repartition.get("service", 0)),
+    #         (_("Resource"), self.md_types_repartition.get("resource", 0)),
+    #     )
 
-        # write data into worksheet
-        for row in data:
-            sheet.append(row)
+    #     # write data into worksheet
+    #     for row in data:
+    #         sheet.append(row)
 
-        # Pie chart
-        pie = PieChart()
-        labels = Reference(sheet, min_col=1, min_row=2, max_row=5)
-        data = Reference(sheet, min_col=2, min_row=1, max_row=5)
-        pie.add_data(data, titles_from_data=True)
-        pie.set_categories(labels)
-        pie.title = _("Metadata by types")
+    #     # Pie chart
+    #     pie = PieChart()
+    #     labels = Reference(sheet, min_col=1, min_row=2, max_row=5)
+    #     data = Reference(sheet, min_col=2, min_row=1, max_row=5)
+    #     pie.add_data(data, titles_from_data=True)
+    #     pie.set_categories(labels)
+    #     pie.title = _("Metadata by types")
 
-        # Cut the first slice out of the pie
-        slice = DataPoint(idx=0, explosion=20)
-        pie.series[0].data_points = [slice]
+    #     # Cut the first slice out of the pie
+    #     slice = DataPoint(idx=0, explosion=20)
+    #     pie.series[0].data_points = [slice]
 
-        return pie
+    #     return pie
 
     def keywords_bar(self, sheet, results, total=20):
         """Return histogram data to represent cataloging activity per week."""
