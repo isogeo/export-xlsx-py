@@ -2,7 +2,9 @@
 #! python3
 
 """
-    Retrieve fixtures for unit testing    
+    Retrieve fixtures for unit testing
+    
+    `python .\tests\fixturing.py`
 """
 
 # #############################################################################
@@ -12,7 +14,7 @@
 # Standard library
 import json
 import logging
-from os import environ, mkdir, path
+from os import environ, path
 from pathlib import Path
 
 # 3rd party
@@ -34,11 +36,11 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 # API access
-API_OAUTH_ID = environ.get("ISOGEO_API_CLIENT_ID")
-API_OAUTH_SECRET = environ.get("ISOGEO_API_CLIENT_SECRET")
+API_OAUTH_ID = environ.get("ISOGEO_API_GROUP_CLIENT_ID")
+API_OAUTH_SECRET = environ.get("ISOGEO_API_GROUP_CLIENT_SECRET")
 API_PLATFORM = environ.get("ISOGEO_PLATFORM", "qa")
-METADATA_TEST_FIXTURE_UUID = environ.get("ISOGEO_FIXTURES_METADATA_COMPLETE")
-WORKGROUP_TEST_FIXTURE_UUID = environ.get("ISOGEO_WORKGROUP_TEST_UUID")
+ISOGEO_FIXTURES_METADATA_COMPLETE = environ.get("ISOGEO_FIXTURES_METADATA_COMPLETE")
+ISOGEO_WORKGROUP_TEST_UUID = environ.get("ISOGEO_WORKGROUP_TEST_UUID")
 
 # ignore warnings related to the QA self-signed cert
 if API_PLATFORM.lower() == "qa":
@@ -87,7 +89,7 @@ out_search_complete_tests = path.join(
 )
 if not path.isfile(out_search_complete_tests):
     request = isogeo.search(
-        query="owner:{}".format(WORKGROUP_TEST_FIXTURE_UUID),
+        query="owner:{}".format(ISOGEO_WORKGROUP_TEST_UUID),
         whole_results=1,
         include="all",
         augment=1,
