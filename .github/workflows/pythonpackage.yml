@@ -22,6 +22,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Lint with flake8
+      env:
+        ISOGEO_ID_URL: ${{ secrets.ISOGEO_ID_URL }}
+        ISOGEO_PLATFORM: ${{ secrets.ISOGEO_PLATFORM }}
+        ISOGEO_API_GROUP_CLIENT_ID: ${{ secrets.ISOGEO_API_GROUP_CLIENT_ID }}
+        ISOGEO_API_GROUP_CLIENT_SECRET: ${{ secrets.ISOGEO_API_GROUP_CLIENT_SECRET }}
+        ISOGEO_FIXTURES_METADATA_COMPLETE: ${{ secrets.ISOGEO_FIXTURES_METADATA_COMPLETE }}
+        ISOGEO_WORKGROUP_TEST_UUID: ${{ secrets.ISOGEO_WORKGROUP_TEST_UUID }}
       run: |
         pip install flake8
         # stop the build if there are Python syntax errors or undefined names
