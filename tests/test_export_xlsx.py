@@ -83,11 +83,6 @@ class TestExportXLSX(unittest.TestCase):
     def test_output_attributes(self):
         """Test output workbook attributes."""
         # attributes
-        self.assertTrue(hasattr(self.out_wb, "cols_v"))
-        self.assertTrue(hasattr(self.out_wb, "cols_r"))
-        self.assertTrue(hasattr(self.out_wb, "cols_s"))
-        self.assertTrue(hasattr(self.out_wb, "cols_rz"))
-        self.assertTrue(hasattr(self.out_wb, "cols_fa"))
         self.assertTrue(hasattr(self.out_wb, "dates_fmt"))
         self.assertTrue(hasattr(self.out_wb, "locale_fmt"))
         self.assertTrue(hasattr(self.out_wb, "stats"))
@@ -115,7 +110,7 @@ class TestExportXLSX(unittest.TestCase):
         # run
         self.out_wb.set_worksheets(auto=search.get("tags").keys())
         self.assertEqual(len(self.out_wb.worksheets), 4)
-        self.assertIn("Raster", self.out_wb.sheetnames)
+        self.assertIn("Rasters", self.out_wb.sheetnames)
         self.assertIn("Services", self.out_wb.sheetnames)
         self.assertIn("Ressources", self.out_wb.sheetnames)
         self.assertIn("Vecteurs", self.out_wb.sheetnames)
@@ -128,7 +123,7 @@ class TestExportXLSX(unittest.TestCase):
         # run
         self.out_wb.set_worksheets(auto=search.get("tags").keys(), attributes=1)
         self.assertEqual(len(self.out_wb.worksheets), 5)
-        self.assertIn("Raster", self.out_wb.sheetnames)
+        self.assertIn("Rasters", self.out_wb.sheetnames)
         self.assertIn("Services", self.out_wb.sheetnames)
         self.assertIn("Ressources", self.out_wb.sheetnames)
         self.assertIn("Vecteurs", self.out_wb.sheetnames)
@@ -148,7 +143,7 @@ class TestExportXLSX(unittest.TestCase):
             fillfull=1,
         )
         self.assertEqual(len(self.out_wb.worksheets), 8)
-        self.assertIn("Raster", self.out_wb.sheetnames)
+        self.assertIn("Rasters", self.out_wb.sheetnames)
         self.assertIn("Services", self.out_wb.sheetnames)
         self.assertIn("Ressources", self.out_wb.sheetnames)
         self.assertIn("Vecteurs", self.out_wb.sheetnames)
@@ -164,7 +159,7 @@ class TestExportXLSX(unittest.TestCase):
         # run
         self.out_wb.set_worksheets(auto=search.get("tags").keys(), attributes=1)
         self.assertEqual(len(self.out_wb.worksheets), 3)
-        self.assertIn("Raster", self.out_wb.sheetnames)
+        self.assertIn("Rasters", self.out_wb.sheetnames)
         self.assertIn("Services", self.out_wb.sheetnames)
         self.assertIn("Ressources", self.out_wb.sheetnames)
         self.assertNotIn("Vecteurs", self.out_wb.sheetnames)
@@ -178,7 +173,7 @@ class TestExportXLSX(unittest.TestCase):
         # run
         self.out_wb.set_worksheets(auto=search.get("tags").keys(), attributes=1)
         self.assertEqual(len(self.out_wb.worksheets), 4)
-        self.assertNotIn("Raster", self.out_wb.sheetnames)
+        self.assertNotIn("Rasters", self.out_wb.sheetnames)
         self.assertIn("Services", self.out_wb.sheetnames)
         self.assertIn("Ressources", self.out_wb.sheetnames)
         self.assertIn("Vecteurs", self.out_wb.sheetnames)
@@ -192,7 +187,7 @@ class TestExportXLSX(unittest.TestCase):
         # run
         self.out_wb.set_worksheets(auto=search.get("tags").keys())
         self.assertEqual(len(self.out_wb.worksheets), 3)
-        self.assertIn("Raster", self.out_wb.sheetnames)
+        self.assertIn("Rasters", self.out_wb.sheetnames)
         self.assertNotIn("Services", self.out_wb.sheetnames)
         self.assertIn("Ressources", self.out_wb.sheetnames)
         self.assertIn("Vecteurs", self.out_wb.sheetnames)
@@ -205,7 +200,7 @@ class TestExportXLSX(unittest.TestCase):
         # run
         self.out_wb.set_worksheets(auto=search.get("tags").keys())
         self.assertEqual(len(self.out_wb.worksheets), 3)
-        self.assertIn("Raster", self.out_wb.sheetnames)
+        self.assertIn("Rasters", self.out_wb.sheetnames)
         self.assertIn("Services", self.out_wb.sheetnames)
         self.assertNotIn("Ressources", self.out_wb.sheetnames)
         self.assertIn("Vecteurs", self.out_wb.sheetnames)
