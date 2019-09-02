@@ -10,12 +10,12 @@ Welcome to Isogeo - XLSX Exporter's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-.. module:: isogeopyxl
+.. module:: isogeotoxlsx
 .. moduleauthor:: Isogeo
 
 :Author: Isogeo
-:Source code: https://github.com/Isogeo/isogeopyxl/
-:Issues: https://github.com/Isogeo/isogeopyxl/issues
+:Source code: https://github.com/Isogeo/isogeotoxlsx/
+:Issues: https://github.com/Isogeo/isogeotoxlsx/issues
 
 Package modules
 +++++++++++++++

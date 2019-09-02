@@ -27,7 +27,7 @@ from isogeo_pysdk import Metadata
 from openpyxl import Workbook
 
 # target
-from isogeopyxl import Isogeo2xlsx, Formatter, Stats
+from isogeotoxlsx import Isogeo2xlsx, Formatter, Stats
 
 # #############################################################################
 # ######## Globals #################

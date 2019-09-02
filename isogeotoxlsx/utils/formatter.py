@@ -35,7 +35,7 @@ from isogeo_pysdk import (
 # ############ Globals ############
 # #################################
 
-logger = logging.getLogger("isogeo2office")  # LOG
+logger = logging.getLogger("isogeotoxlsx")  # LOG
 utils = IsogeoUtils()
 
 # ##############################################################################
