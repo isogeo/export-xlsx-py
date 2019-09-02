@@ -115,7 +115,7 @@ class TestExportXLSX(unittest.TestCase):
         # run
         self.out_wb.set_worksheets(auto=search.get("tags").keys())
         self.assertEqual(len(self.out_wb.worksheets), 4)
-        self.assertIn("Raster", self.out_wb.sheetnames)
+        self.assertIn("Rasters", self.out_wb.sheetnames)
         self.assertIn("Services", self.out_wb.sheetnames)
         self.assertIn("Ressources", self.out_wb.sheetnames)
         self.assertIn("Vecteurs", self.out_wb.sheetnames)
@@ -128,7 +128,7 @@ class TestExportXLSX(unittest.TestCase):
         # run
         self.out_wb.set_worksheets(auto=search.get("tags").keys(), attributes=1)
         self.assertEqual(len(self.out_wb.worksheets), 5)
-        self.assertIn("Raster", self.out_wb.sheetnames)
+        self.assertIn("Rasters", self.out_wb.sheetnames)
         self.assertIn("Services", self.out_wb.sheetnames)
         self.assertIn("Ressources", self.out_wb.sheetnames)
         self.assertIn("Vecteurs", self.out_wb.sheetnames)
@@ -148,7 +148,7 @@ class TestExportXLSX(unittest.TestCase):
             fillfull=1,
         )
         self.assertEqual(len(self.out_wb.worksheets), 8)
-        self.assertIn("Raster", self.out_wb.sheetnames)
+        self.assertIn("Rasters", self.out_wb.sheetnames)
         self.assertIn("Services", self.out_wb.sheetnames)
         self.assertIn("Ressources", self.out_wb.sheetnames)
         self.assertIn("Vecteurs", self.out_wb.sheetnames)
@@ -164,7 +164,7 @@ class TestExportXLSX(unittest.TestCase):
         # run
         self.out_wb.set_worksheets(auto=search.get("tags").keys(), attributes=1)
         self.assertEqual(len(self.out_wb.worksheets), 3)
-        self.assertIn("Raster", self.out_wb.sheetnames)
+        self.assertIn("Rasters", self.out_wb.sheetnames)
         self.assertIn("Services", self.out_wb.sheetnames)
         self.assertIn("Ressources", self.out_wb.sheetnames)
         self.assertNotIn("Vecteurs", self.out_wb.sheetnames)
@@ -178,7 +178,7 @@ class TestExportXLSX(unittest.TestCase):
         # run
         self.out_wb.set_worksheets(auto=search.get("tags").keys(), attributes=1)
         self.assertEqual(len(self.out_wb.worksheets), 4)
-        self.assertNotIn("Raster", self.out_wb.sheetnames)
+        self.assertNotIn("Rasters", self.out_wb.sheetnames)
         self.assertIn("Services", self.out_wb.sheetnames)
         self.assertIn("Ressources", self.out_wb.sheetnames)
         self.assertIn("Vecteurs", self.out_wb.sheetnames)
@@ -192,7 +192,7 @@ class TestExportXLSX(unittest.TestCase):
         # run
         self.out_wb.set_worksheets(auto=search.get("tags").keys())
         self.assertEqual(len(self.out_wb.worksheets), 3)
-        self.assertIn("Raster", self.out_wb.sheetnames)
+        self.assertIn("Rasters", self.out_wb.sheetnames)
         self.assertNotIn("Services", self.out_wb.sheetnames)
         self.assertIn("Ressources", self.out_wb.sheetnames)
         self.assertIn("Vecteurs", self.out_wb.sheetnames)
@@ -205,7 +205,7 @@ class TestExportXLSX(unittest.TestCase):
         # run
         self.out_wb.set_worksheets(auto=search.get("tags").keys())
         self.assertEqual(len(self.out_wb.worksheets), 3)
-        self.assertIn("Raster", self.out_wb.sheetnames)
+        self.assertIn("Rasters", self.out_wb.sheetnames)
         self.assertIn("Services", self.out_wb.sheetnames)
         self.assertNotIn("Ressources", self.out_wb.sheetnames)
         self.assertIn("Vecteurs", self.out_wb.sheetnames)

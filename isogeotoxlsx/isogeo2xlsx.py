@@ -18,13 +18,14 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 # 3rd party library
-from isogeo_pysdk import IsogeoTranslator, IsogeoUtils, Metadata, Share
+from isogeo_pysdk import IsogeoUtils, Metadata, Share
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, NamedStyle
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.worksheet import Worksheet
 
 # custom submodules
+from isogeotoxlsx.i18n import I18N_EN, I18N_FR
 from isogeotoxlsx.matrix import (
     RASTER_COLUMNS,
     RESOURCE_COLUMNS,
@@ -228,13 +229,12 @@ class Isogeo2xlsx(Workbook):
             s_date.number_format = "dd/mm/yyyy"
             self.dates_fmt = "DD/MM/YYYY"
             self.locale_fmt = "fr_FR"
+            self.tr = I18N_FR
         else:
             s_date.number_format = "yyyy/mm/dd"
             self.dates_fmt = "YYYY/MM/DD"
             self.locale_fmt = "uk_UK"
-
-        # TRANSLATIONS
-        self.tr = IsogeoTranslator(lang).tr
+            self.tr = I18N_EN
 
         # FORMATTER
         self.fmt = Formatter(output_type="Excel")
