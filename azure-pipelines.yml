@@ -100,11 +100,12 @@ jobs:
   steps:
   - task: GitHubRelease@0
     inputs:
-      gitHubConnection: 'Azure DevOps'
+      gitHubConnection: 'github_repo_access'
       repositoryName: 'isogeo/export-xlsx-py'
       action: 'create'
       target: '$(Build.SourceVersion)'
       tagSource: 'auto'
+      compareWith: 'lastFullRelease'
 
   - task: UsePythonVersion@0
     inputs:
