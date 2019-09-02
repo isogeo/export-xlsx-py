@@ -2,62 +2,83 @@
 #! python3
 
 """
-    Matching table between Isogeo metadata model and Excle columns for Isogeo to Office.
+    Matching table between Isogeo metadata model and Excel columns for Isogeo to Office.
 """
 
+# ##############################################################################
+# ############ Globals ############
+# #################################
 VECTOR_COLUMNS = {
-    # model
-    "_created": ("AM", "COL_TITLE", "0"),
-    "_creator": ("E", "COL_TITLE", "0"),
-    "_id": ("AL", "COL_TITLE", "0"),
-    "_modified": ("AN", "COL_TITLE", "0"),
-    "abstract": ("C", "COL_TITLE", "0"),
-    "collectionContext": ("I", "COL_TITLE", "0"),
-    "collectionMethod": ("J", "COL_TITLE", "0"),
-    "conditions": ("AD", "COL_TITLE", "0"),
-    "contacts": ("AF", "COL_TITLE", "0"),
-    "coordinateSystem": ("T", "COL_TITLE", "0"),
-    "created": ("O", "COL_TITLE", "0"),
-    "distance": ("W", "COL_TITLE", "0"),
-    "editionProfile": ("", "COL_TITLE", "0"),
-    "encoding": ("", "COL_TITLE", "0"),
-    "envelope": ("U", "COL_TITLE", "0"),
-    "events": ("P", "COL_TITLE", "0"),
-    "featureAttributes": ("AA", "COL_TITLE", "0"),
-    "features": ("Y", "COL_TITLE", "0"),
-    "format": ("S", "COL_TITLE", "0"),
-    "formatVersion": ("", "COL_TITLE", "0"),
-    "geometry": ("V", "COL_TITLE", "0"),
-    "keywords": ("F", "COL_TITLE", "0"),
-    "language": ("AO", "COL_TITLE", "0"),
-    "layers": ("", "COL_TITLE", "0"),
-    "limitations": ("AE", "COL_TITLE", "0"),
-    "links": ("", "COL_TITLE", "0"),
-    "modified": ("Q", "COL_TITLE", "0"),
-    "name": ("B", "COL_TITLE", "0"),
-    "operations": ("", "COL_TITLE", "0"),
-    "path": ("D", "COL_TITLE", "0"),
-    "precisio(n": ("", "COL_TITLE", "0"),
-    "published": ("R", "COL_TITLE", "0"),
-    "scale": ("X", "COL_TITLE", "0"),
-    "series": ("", "COL_TITLE", "0"),
-    "serviceLayers": ("", "COL_TITLE", "0"),
-    "specifications": ("AB", "COL_TITLE", "0"),
-    "tags": ("", "COL_TITLE", "0"),
-    "title": ("A", "COL_TITLE", "0"),
-    "topologicalConsistency": ("AC", "COL_TITLE", "0"),
-    "typ(e": ("", "COL_TITLE", "0"),
-    "updateFrequency": ("M", "COL_TITLE", "0"),
-    "validFrom": ("K", "COL_TITLE", "0"),
-    "validTo": ("L", "COL_TITLE", "0"),
-    "validityComment": ("N", "COL_TITLE", "0"),
+    "_created": ("AM", 0),
+    "_creator": ("E", 0),
+    "_id": ("AL", 0),
+    "_modified": ("AN", 0),
+    "abstract": ("C", 0),
+    "collectionContext": ("I", 0),
+    "collectionMethod": ("J", 0),
+    "conditions": ("AD", 0),
+    "contacts": ("AF", 0),
+    "coordinateSystem": ("T", 0),
+    "created": ("O", 0),
+    "distance": ("W", 0),
+    "editionProfile": (None, 0),
+    "encoding": (None, 0),
+    "envelope": ("U", 0),
+    "events": ("P", 0),
+    "featureAttributes": ("AA", 0),
+    "features": ("Y", 0),
+    "format": ("S", 0),
+    "formatVersion": (None, 0),
+    "geometry": ("V", 0),
+    "keywords": ("F", 0),
+    "language": ("AO", 0),
+    "layers": (None, 0),
+    "limitations": ("AE", 0),
+    "links": (None, 0),
+    "modified": ("Q", 0),
+    "name": ("B", 0),
+    "operations": (None, 0),
+    "path": ("D", 0),
+    "precisio(n": (None, 0),
+    "published": ("R", 0),
+    "scale": ("X", 0),
+    "series": (None, 0),
+    "serviceLayers": (None, 0),
+    "specifications": ("AB", 0),
+    "tags": (None, 0),
+    "title": ("A", 0),
+    "topologicalConsistency": ("AC", 0),
+    "typ(e": (None, 0),
+    "updateFrequency": ("M", 0),
+    "validFrom": ("K", 0),
+    "validTo": ("L", 0),
+    "validityComment": ("N", 0),
     # specific,
-    "featureAttributesCount": ("Z", "COL_TITLE", "0"),
-    "hasLinkDownload": ("AG", "COL_TITLE", "0"),
-    "hasLinkOther": ("AI", "COL_TITLE", "0"),
-    "hasLinkView": ("AH", "COL_TITLE", "0"),
-    "linkEdit": ("AJ", "COL_TITLE", "0"),
-    "linkView": ("AK", "COL_TITLE", "0"),
-    "inspireConformance": ("H", "COL_TITLE", "0"),
-    "inspireThemes": ("G", "COL_TITLE", "0"),
+    "featureAttributesCount": ("Z", 0),
+    "hasLinkDownload": ("AG", 0),
+    "hasLinkOther": ("AI", 0),
+    "hasLinkView": ("AH", 0),
+    "linkEdit": ("AJ", 0),
+    "linkView": ("AK", 0),
+    "inspireConformance": ("H", 0),
+    "inspireThemes": ("G", 0),
 }
+
+# #############################################################################
+# ##### Stand alone program ########
+# ##################################
+if __name__ == "__main__":
+    """ Standalone execution and development tests """
+    # specific imports
+    from collections import namedtuple
+
+    # set namedtuple structure
+    Column = namedtuple("Column", ["letter", "wrap"])
+    # apply transformation
+    columns_vector = {k: Column._make(v) for k, v in VECTOR_COLUMNS.items()}
+    # check
+    print(isinstance(columns_vector, dict))
+    print(isinstance(columns_vector.get("title"), Column))
+
+    for k, v in columns_vector.items():
+        print(k, type(v), v.letter)

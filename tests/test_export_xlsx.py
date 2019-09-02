@@ -83,11 +83,6 @@ class TestExportXLSX(unittest.TestCase):
     def test_output_attributes(self):
         """Test output workbook attributes."""
         # attributes
-        self.assertTrue(hasattr(self.out_wb, "cols_v"))
-        self.assertTrue(hasattr(self.out_wb, "cols_r"))
-        self.assertTrue(hasattr(self.out_wb, "cols_s"))
-        self.assertTrue(hasattr(self.out_wb, "cols_rz"))
-        self.assertTrue(hasattr(self.out_wb, "cols_fa"))
         self.assertTrue(hasattr(self.out_wb, "dates_fmt"))
         self.assertTrue(hasattr(self.out_wb, "locale_fmt"))
         self.assertTrue(hasattr(self.out_wb, "stats"))
