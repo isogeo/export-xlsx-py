@@ -19,8 +19,8 @@ import sys
 sys.path.insert(0, os.path.abspath(r'..'))
 
 
-from isogeopyxl.__about__ import __title__, __version__ as VERSION
-from isogeopyxl import *
+from isogeotoxlsx.__about__ import __title__, __version__ as VERSION
+from isogeotoxlsx import *
 
 # -- Build environment -----------------------------------------------------
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
@@ -199,7 +199,7 @@ def run_apidoc(_):
 
     cur_dir = os.path.normpath(os.path.dirname(__file__))
     output_path = os.path.join(cur_dir, '_apidoc')
-    modules = os.path.normpath(os.path.join(cur_dir, "../isogeopyxl/"))
+    modules = os.path.normpath(os.path.join(cur_dir, "../isogeotoxlsx/"))
     exclusions = [
         '../input',
         '../output',
