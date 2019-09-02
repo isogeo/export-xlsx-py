@@ -10,7 +10,7 @@ Python package to export Isogeo metadata into Excel workshbook using the [Python
 
 1. Install:
 
-    ```python
+    ```powershell
     pip install isogeo-export-xl
     ```
 
