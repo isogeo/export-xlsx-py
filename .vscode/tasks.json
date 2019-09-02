@@ -19,7 +19,7 @@
                 "-m",
                 "black",
                 "--target-version=py37",
-                "./isogeopyxl"
+                "./isogeotoxlsx"
             ],
             "group": "build",
             "problemMatcher": []
