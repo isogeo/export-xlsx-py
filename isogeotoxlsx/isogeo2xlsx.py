@@ -12,7 +12,7 @@
 
 # Standard library
 import logging
-from collections import Counter
+from collections import Counter, namedtuple
 from collections.abc import KeysView
 from pathlib import Path
 from urllib.parse import urlparse
@@ -25,20 +25,20 @@ from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.worksheet import Worksheet
 
 # custom submodules
-from isogeopyxl.matrix import (
+from isogeotoxlsx.matrix import (
     RASTER_COLUMNS,
     RESOURCE_COLUMNS,
     SERVICE_COLUMNS,
     VECTOR_COLUMNS,
 )
-from isogeopyxl.utils import Formatter, Stats
+from isogeotoxlsx.utils import Formatter, Stats
 
 # ##############################################################################
 # ############ Globals ############
 # #################################
 
-
-logger = logging.getLogger("isogeo2office")
+logger = logging.getLogger("isogeotoxlsx")
+Column = namedtuple("Column", ["letter", "title", "wrap"])
 utils = IsogeoUtils()
 
 # ##############################################################################
@@ -461,13 +461,13 @@ class Isogeo2xlsx(Workbook):
         :param int idx: row index in the worksheet
         """
         if md.type == "rasterDataset":
-            colsref = RASTER_COLUMNS
+            col = RASTER_COLUMNS
         elif md.type == "resource":
-            colsref = RESOURCE_COLUMNS
+            col = RESOURCE_COLUMNS
         elif md.type == "service":
-            colsref = SERVICE_COLUMNS
+            col = SERVICE_COLUMNS
         elif md.type == "vectorDataset":
-            colsref = VECTOR_COLUMNS
+            col = {k: Column._make(v) for k, v in VECTOR_COLUMNS.items()}
         else:
             raise TypeError("Unknown metadata type: {}".format(md.type))
 
@@ -479,11 +479,11 @@ class Isogeo2xlsx(Workbook):
 
         # -- IDENTIFICATION ------------------------------------------------------------
         if md.title:
-            ws["{}{}".format(colsref.get("title"), idx)] = md.title
+            ws["{}{}".format(col.get("title").letter, idx)] = md.title
         if md.name:
-            ws["{}{}".format(colsref.get("name"), idx)] = md.name
+            ws["{}{}".format(col.get("name"), idx)] = md.name
         if md.abstract:
-            ws["{}{}".format(colsref.get("abstract"), idx)] = md.abstract
+            ws["{}{}".format(col.get("abstract"), idx)] = md.abstract
 
         # path to source
         try:
@@ -502,16 +502,16 @@ class Isogeo2xlsx(Workbook):
                 link_path = r'=HYPERLINK("{0}","{1}")'.format(
                     src_path.parent, src_path.resolve()
                 )
-                ws["{}{}".format(colsref.get("path"), idx)] = link_path
+                ws["{}{}".format(col.get("path"), idx)] = link_path
                 logger.debug("Path reachable: {}".format(src_path))
             else:
-                ws["{}{}".format(colsref.get("path"), idx)] = str(src_path.resolve())
+                ws["{}{}".format(col.get("path"), idx)] = str(src_path.resolve())
                 logger.debug(
                     "Path not recognized nor reachable: {}".format(str(src_path))
                 )
         elif md.path and md.type == "service":
             link_path = r'=HYPERLINK("{0}","{1}")'.format(md.path, md.path)
-            ws["{}{}".format(colsref.get("path"), idx)] = link_path
+            ws["{}{}".format(col.get("path"), idx)] = link_path
         else:
             pass
 
@@ -528,11 +528,11 @@ class Isogeo2xlsx(Workbook):
                     logger.info("Unknown keyword type: " + k.get("_tag"))
                     continue
             if keywords:
-                ws["{}{}".format(colsref.get("keywords"), idx)] = " ;\n".join(
+                ws["{}{}".format(col.get("keywords"), idx)] = " ;\n".join(
                     sorted(keywords)
                 )
             if inspire:
-                ws["{}{}".format(colsref.get("inspireThemes"), idx)] = " ;\n".join(
+                ws["{}{}".format(col.get("inspireThemes"), idx)] = " ;\n".join(
                     sorted(inspire)
                 )
         else:
@@ -540,71 +540,67 @@ class Isogeo2xlsx(Workbook):
             logger.info("Vector dataset without any keyword or INSPIRE theme")
 
         # INSPIRE conformity
-        ws["{}{}".format(colsref.get("inspireConformance"), idx)] = (
+        ws["{}{}".format(col.get("inspireConformance"), idx)] = (
             "conformity:inspire" in md.tags
         )
 
         # owner
-        ws["{}{}".format(colsref.get("_creator"), idx)] = next(
+        ws["{}{}".format(col.get("_creator"), idx)] = next(
             v for k, v in md.tags.items() if "owner:" in k
         )
 
         # -- HISTORY -------------------------------------------------------------------
         if md.collectionContext:
-            ws[
-                "{}{}".format(colsref.get("collectionContext"), idx)
-            ] = md.collectionContext
+            ws["{}{}".format(col.get("collectionContext"), idx)] = md.collectionContext
         if md.collectionMethod:
-            ws[
-                "{}{}".format(colsref.get("collectionMethod"), idx)
-            ] = md.collectionMethod
+            ws["{}{}".format(col.get("collectionMethod"), idx)] = md.collectionMethod
 
         # validity
         if md.validFrom:
-            ws["{}{}".format(colsref.get("validFrom"), idx)] = utils.hlpr_datetimes(
+            ws["{}{}".format(col.get("validFrom"), idx)] = utils.hlpr_datetimes(
                 md.validFrom
             )
-            ws["{}{}".format(colsref.get("validFrom"), idx)].style = "date"
+            ws["{}{}".format(col.get("validFrom"), idx)].style = "date"
 
         if md.validTo:
-            ws["{}{}".format(colsref.get("validTo"), idx)] = utils.hlpr_datetimes(
+            ws["{}{}".format(col.get("validTo"), idx)] = utils.hlpr_datetimes(
                 md.validTo
             )
-            ws["{}{}".format(colsref.get("validTo"), idx)].style = "date"
+            ws["{}{}".format(col.get("validTo"), idx)].style = "date"
 
         if md.updateFrequency:
-            ws["{}{}".format(colsref.get("updateFrequency"), idx)] = md.updateFrequency
+            ws["{}{}".format(col.get("updateFrequency"), idx)] = md.updateFrequency
         if md.validityComment:
-            ws["{}{}".format(colsref.get("validityComment"), idx)] = md.validityComment
+            ws["{}{}".format(col.get("validityComment"), idx)] = md.validityComment
 
         # -- EVENTS --------------------------------------------------------------------
         # data creation date
         if md.created:
-            ws["{}{}".format(colsref.get("created"), idx)] = utils.hlpr_datetimes(
+            ws["{}{}".format(col.get("created"), idx)] = utils.hlpr_datetimes(
                 md.created
             )
-            ws["{}{}".format(colsref.get("created"), idx)].style = "date"
+            ws["{}{}".format(col.get("created"), idx)].style = "date"
 
         # events count
         if md.events:
-            ws["{}{}".format(colsref.get("events"), idx)] = len(md.events)
+            ws["{}{}".format(col.get("events"), idx)] = len(md.events)
 
         # data last update
         if md.modified:
-            ws["{}{}".format(colsref.get("modified"), idx)] = utils.hlpr_datetimes(
+            ws["{}{}".format(col.get("modified"), idx)] = utils.hlpr_datetimes(
                 md.modified
             )
-            ws["{}{}".format(colsref.get("modified"), idx)].style = "date"
+            ws["{}{}".format(col.get("modified"), idx)].style = "date"
 
         # -- TECHNICAL -----------------------------------------------------------------
         # format
         if md.format and md.type in ("rasterDataset", "vectorDataset"):
             format_lbl = next(v for k, v in md.tags.items() if "format:" in k)
-            ws["{}{}".format(colsref.get("format"), idx)] = "{0} ({1} - {2})".format(
+            ws["{}{}".format(col.get("format"), idx)] = "{0} ({1} - {2})".format(
                 format_lbl, md.formatVersion, md.encoding
             )
         elif md.format:
-            ws["{}{}".format(colsref.get("format"), idx)] = "{0} {1}".format(
+            ws["{}{}".format(col.get("format"), idx)] = "{0} {1}".format(
                 md.format, md.formatVersion
             )
         else:
@@ -612,9 +608,7 @@ class Isogeo2xlsx(Workbook):
 
         # SRS
         if isinstance(md.coordinateSystem, dict):
-            ws[
-                "{}{}".format(colsref.get("coordinateSystem"), idx)
-            ] = "{0} ({1})".format(
+            ws["{}{}".format(col.get("coordinateSystem"), idx)] = "{0} ({1})".format(
                 md.coordinateSystem.get("name"), md.coordinateSystem.get("code")
             )
 
@@ -631,27 +625,27 @@ class Isogeo2xlsx(Workbook):
                 bbox = ",\n".join(
                     format(coord, ".4f") for coord in md.envelope.get("bbox")
                 )
-            ws["{}{}".format(colsref.get("envelope"), idx)] = bbox
+            ws["{}{}".format(col.get("envelope"), idx)] = bbox
 
         # geometry
         if md.geometry:
-            ws["{}{}".format(colsref.get("geometry"), idx)] = md.geometry
+            ws["{}{}".format(col.get("geometry"), idx)] = md.geometry
 
         # resolution
         if md.distance:
-            ws["{}{}".format(colsref.get("distance"), idx)] = md.distance
+            ws["{}{}".format(col.get("distance"), idx)] = md.distance
 
         # scale
         if md.scale:
-            ws["{}{}".format(colsref.get("scale"), idx)] = md.scale
+            ws["{}{}".format(col.get("scale"), idx)] = md.scale
 
         # features objects
         if md.features:
-            ws["{}{}".format(colsref.get("features"), idx)] = md.features
+            ws["{}{}".format(col.get("features"), idx)] = md.features
 
         # -- QUALITY -------------------------------------------------------------------
         if md.specifications:
-            ws["{}{}".format(colsref.get("specifications"), idx)] = " ;\n".join(
+            ws["{}{}".format(col.get("specifications"), idx)] = " ;\n".join(
                 self.fmt.specifications(md.specifications)
             )
 
@@ -664,7 +658,7 @@ class Isogeo2xlsx(Workbook):
             fields = md.featureAttributes
 
             # count
-            ws["{}{}".format(colsref.get("featureAttributesCount"), idx)] = len(fields)
+            ws["{}{}".format(col.get("featureAttributesCount"), idx)] = len(fields)
             # alphabetic list
             fields_cct = sorted(
                 [
@@ -678,7 +672,7 @@ class Isogeo2xlsx(Workbook):
                     for field in fields
                 ]
             )
-            ws["{}{}".format(colsref.get("featureAttributes"), idx)] = " ;\n".join(
+            ws["{}{}".format(col.get("featureAttributes"), idx)] = " ;\n".join(
                 fields_cct
             )
             # if attributes analisis is activated, append fields dict
@@ -689,13 +683,13 @@ class Isogeo2xlsx(Workbook):
 
         # -- CGUs ----------------------------------------------------------------------
         if md.conditions:
-            ws["{}{}".format(colsref.get("conditions"), idx)] = " ;\n".join(
+            ws["{}{}".format(col.get("conditions"), idx)] = " ;\n".join(
                 self.fmt.conditions(md.conditions)
             )
 
         # -- LIMITATIONS ---------------------------------------------------------------
         if md.limitations:
-            ws["{}{}".format(colsref.get("limitations"), idx)] = " ;\n".join(
+            ws["{}{}".format(col.get("limitations"), idx)] = " ;\n".join(
                 self.fmt.limitations(md.limitations)
             )
 
@@ -708,44 +702,44 @@ class Isogeo2xlsx(Workbook):
                 )
                 for contact in md.contacts
             ]
-            ws["{}{}".format(colsref.get("contacts"), idx)] = " ;\n".join(contacts)
+            ws["{}{}".format(col.get("contacts"), idx)] = " ;\n".join(contacts)
 
         # -- ACTIONS -------------------------------------------------------------------
-        ws["{}{}".format(colsref.get("hasLinkDownload"), idx)] = (
+        ws["{}{}".format(col.get("hasLinkDownload"), idx)] = (
             "action:download" in md.tags
         )
-        ws["{}{}".format(colsref.get("hasLinkView"), idx)] = "action:view" in md.tags
-        ws["{}{}".format(colsref.get("hasLinkOther"), idx)] = "action:other" in md.tags
+        ws["{}{}".format(col.get("hasLinkView"), idx)] = "action:view" in md.tags
+        ws["{}{}".format(col.get("hasLinkOther"), idx)] = "action:other" in md.tags
 
         # -- METADATA ------------------------------------------------------------------
         # id
-        ws["{}{}".format(colsref.get("_id"), idx)] = md._id
+        ws["{}{}".format(col.get("_id"), idx)] = md._id
 
         # creation
         if md._created:
-            ws["{}{}".format(colsref.get("_created"), idx)] = utils.hlpr_datetimes(
+            ws["{}{}".format(col.get("_created"), idx)] = utils.hlpr_datetimes(
                 md._created
             )
-            ws["{}{}".format(colsref.get("_created"), idx)].style = "date"
+            ws["{}{}".format(col.get("_created"), idx)].style = "date"
 
         # last update
         if md._modified:
-            ws["{}{}".format(colsref.get("_modified"), idx)] = utils.hlpr_datetimes(
+            ws["{}{}".format(col.get("_modified"), idx)] = utils.hlpr_datetimes(
                 md._modified
             )
-            ws["{}{}".format(colsref.get("_modified"), idx)].style = "date"
+            ws["{}{}".format(col.get("_modified"), idx)].style = "date"
 
         # edit
-        # ws["{}{}".format(colsref.get("linkEdit"), idx)] = md.admin_url(self.url_base_edit) + "identification"
-        ws["{}{}".format(colsref.get("linkEdit"), idx)] = utils.get_edit_url(md)
+        # ws["{}{}".format(col.get("linkEdit"), idx)] = md.admin_url(self.url_base_edit) + "identification"
+        ws["{}{}".format(col.get("linkEdit"), idx)] = utils.get_edit_url(md)
         if self.share is not None:
             link_visu = utils.get_view_url(
                 md_id=md._id, share_id=self.share._id, share_token=self.share.urlToken
             )
-            ws["{}{}".format(colsref.get("linkView"), idx)] = link_visu
+            ws["{}{}".format(col.get("linkView"), idx)] = link_visu
 
         # lang
-        ws["{}{}".format(colsref.get("language"), idx)] = md.language
+        ws["{}{}".format(col.get("language"), idx)] = md.language
 
     def store_md_vector(self, md: Metadata, ws: Worksheet, idx: int):
         """ TO DOCUMENT
@@ -906,4 +900,85 @@ class Isogeo2xlsx(Workbook):
 # ##################################
 if __name__ == "__main__":
     """ Standalone execution and development tests """
-    wb = Isogeo2xlsx(url_base="https://open.isogeo.com")
+    # ------------ Specific imports ----------------
+    from dotenv import load_dotenv
+    from logging.handlers import RotatingFileHandler
+    from os import environ
+    import urllib3
+
+    from isogeo_pysdk import Isogeo
+
+    # ------------ Log & debug ----------------
+    logger = logging.getLogger()
+    logging.captureWarnings(True)
+    logger.setLevel(logging.DEBUG)
+    # logger.setLevel(logging.INFO)
+
+    log_format = logging.Formatter(
+        "%(asctime)s || %(levelname)s "
+        "|| %(module)s - %(lineno)d ||"
+        " %(funcName)s || %(message)s"
+    )
+
+    # debug to the file
+    log_file_handler = RotatingFileHandler("dev_debug.log", "a", 3000000, 1)
+    log_file_handler.setLevel(logging.DEBUG)
+    log_file_handler.setFormatter(log_format)
+
+    # info to the console
+    log_console_handler = logging.StreamHandler()
+    log_console_handler.setLevel(logging.INFO)
+    log_console_handler.setFormatter(log_format)
+
+    logger.addHandler(log_file_handler)
+    logger.addHandler(log_console_handler)
+
+    # ------------ Real start ----------------
+    # get user ID as environment variables
+    load_dotenv("dev.env")
+
+    # ignore warnings related to the QA self-signed cert
+    if environ.get("ISOGEO_PLATFORM").lower() == "qa":
+        urllib3.disable_warnings()
+
+    # for oAuth2 Backend (Client Credentials Grant) Flow
+    isogeo = Isogeo(
+        auth_mode="group",
+        client_id=environ.get("ISOGEO_API_GROUP_CLIENT_ID"),
+        client_secret=environ.get("ISOGEO_API_GROUP_CLIENT_SECRET"),
+        auto_refresh_url="{}/oauth/token".format(environ.get("ISOGEO_ID_URL")),
+        platform=environ.get("ISOGEO_PLATFORM", "qa"),
+    )
+
+    # getting a token
+    isogeo.connect()
+
+    # misc
+    METADATA_TEST_FIXTURE_UUID = environ.get("ISOGEO_FIXTURES_METADATA_COMPLETE")
+    WORKGROUP_TEST_FIXTURE_UUID = environ.get("ISOGEO_WORKGROUP_TEST_UUID")
+
+    search = isogeo.search(
+        whole_results=0,
+        query="type:vector-dataset owner:{}".format(WORKGROUP_TEST_FIXTURE_UUID),
+        include="all",
+    )
+
+    isogeo.close()  # close session
+
+    print(
+        "{}/{} metadata ready to be exported.".format(len(search.results), search.total)
+    )
+
+    # instanciate th final workbook
+    out_workbook = Isogeo2xlsx(
+        lang=isogeo.lang, url_base_edit=isogeo.app_url, url_base_view=isogeo.oc_url
+    )
+    # add needed worksheets
+    out_workbook.set_worksheets(auto=search.tags.keys())
+
+    # parse search results
+    for md in map(Metadata.clean_attributes, search.results):
+        out_workbook.store_metadatas(md)
+
+    # save file
+    out_workbook.save("test_isogeo_export_to_xlsx.xlsx")

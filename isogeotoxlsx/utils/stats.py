@@ -31,7 +31,7 @@ from openpyxl.chart import BarChart, Reference
 # #################################
 
 # LOG
-logger = logging.getLogger("isogeo2office")
+logger = logging.getLogger("isogeotoxlsx")
 
 # ############################################################################
 # ######## Classes ###############

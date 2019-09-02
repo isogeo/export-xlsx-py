@@ -32,7 +32,7 @@ from dotenv import load_dotenv
 from isogeo_pysdk import Isogeo, MetadataSearch
 
 # target
-from isogeopyxl import Formatter
+from isogeotoxlsx import Formatter
 
 # #############################################################################
 # ######## Globals #################

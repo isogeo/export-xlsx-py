@@ -17,7 +17,7 @@ import pathlib
 from setuptools import find_packages, setup
 
 # package (to get version)
-from isogeopyxl.__about__ import __version__, __summary__
+from isogeotoxlsx.__about__ import __version__, __summary__
 
 # SETUP ######################################################################
 
