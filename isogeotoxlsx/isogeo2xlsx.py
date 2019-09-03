@@ -285,27 +285,34 @@ class Isogeo2xlsx(Workbook):
             self.idx_v += 1
             self.store_md_generic(metadata, self.ws_v, self.idx_v)
             self.stats.md_types_repartition["vector"] += 1
-            # self.store_md_vector(metadata, self.ws_v, self.idx_v)
+            # style it
+            self.column_width(self.ws_v, self.columns_vector)
             self.row_height(self.ws_v)
             self.styling_cells(self.ws_v, self.columns_vector)
         elif metadata.type == "rasterDataset":
             self.idx_r += 1
             self.store_md_generic(metadata, self.ws_r, self.idx_r)
             self.stats.md_types_repartition["raster"] += 1
-            self.row_height(self.ws_v)
-            self.styling_cells(self.ws_v, self.columns_vector)
+            # style it
+            self.column_width(self.ws_r, self.columns_raster)
+            self.row_height(self.ws_r)
+            self.styling_cells(self.ws_r, self.columns_raster)
         elif metadata.type == "service":
             self.idx_s += 1
             self.store_md_generic(metadata, self.ws_s, self.idx_s)
             self.stats.md_types_repartition["service"] += 1
-            self.row_height(self.ws_v)
-            self.styling_cells(self.ws_v, self.columns_vector)
+            # style it
+            self.column_width(self.ws_s, self.columns_service)
+            self.row_height(self.ws_s)
+            self.styling_cells(self.ws_s, self.columns_service)
         elif metadata.type == "resource":
             self.idx_rz += 1
             self.store_md_generic(metadata, self.ws_rz, self.idx_rz)
             self.stats.md_types_repartition["resource"] += 1
-            self.row_height(self.ws_v)
-            self.styling_cells(self.ws_v, self.columns_vector)
+            # style it
+            self.column_width(self.ws_rz, self.columns_resource)
+            self.row_height(self.ws_rz)
+            self.styling_cells(self.ws_rz, self.columns_resource)
         else:
             logger.error(
                 "Type of metadata is not recognized/handled: {}".format(metadata.type)
@@ -661,6 +668,19 @@ class Isogeo2xlsx(Workbook):
         for row_cols in ws.iter_cols(min_row=1, max_row=1):
             for cell in row_cols:
                 cell.style = "Headline 2"
+
+    def column_width(self, ws: Worksheet, columns: ColumnPattern):
+        """Set the width of the columns of the passed worksheet.
+
+        :param Worksheet ws: worksheet into write headers
+        :param ColumnPattern columns: column table
+        """
+        # apply heigth - see #52
+        for v in columns.values():
+            # ignore empties columns
+            if v.letter is None or v.width is None:
+                continue
+            ws.column_dimensions[v.letter].width = v.width
 
     def row_height(self, ws: Worksheet, from_row: int = 2, height: int = 35):
         """Set the height of the rows of the passed worksheet.
