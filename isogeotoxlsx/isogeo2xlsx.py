@@ -12,7 +12,6 @@
 
 # Standard library
 import logging
-from collections import Counter
 from collections.abc import KeysView
 from pathlib import Path
 from urllib.parse import urlparse
@@ -168,13 +167,7 @@ class Isogeo2xlsx(Workbook):
 
         # SHEETS & HEADERS
         if dashboard:
-            self.ws_d = self.create_sheet(title="Tableau de bord")
-            # headers
-            # self.ws_f.append([i for i in self.cols_v])
-            # styling
-            # for i in self.cols_v:
-            #     self.ws_v.cell(row=1,
-            #                    column=self.cols_v.index(i) + 1).style = "Headline 2"
+            self.ws_d = self.create_sheet(title=self.tr.get("dashboard"))
             # initialize line counter
             self.idx_d = 1
             # log
@@ -622,6 +615,7 @@ class Isogeo2xlsx(Workbook):
 
     # ------------ Analisis --------------------------------------------------
     def launch_analisis(self):
+        """Launches special analisis, using the stats submodule."""
         # special analisis
         if hasattr(self, "ws_fa"):
             self.stats.attributes(all_attributes=self.fa_all, ws_attributes=self.ws_fa)
@@ -629,9 +623,11 @@ class Isogeo2xlsx(Workbook):
             self.column_width(self.ws_fa, self.columns_attributes)
             self.row_height(self.ws_fa)
             self.styling_cells(self.ws_fa, self.columns_attributes)
+            logger.info("Analisis of feature attributes sheet has been added.")
 
         if hasattr(self, "ws_d"):
-            print("youpi")
+            self.stats.metadata_types(self.ws_d)
+            logger.info("Dashboard sheet has been added.")
 
     # ------------ Customize worksheet ----------------------------------------
     def headers_writer(self, ws: Worksheet, columns: ColumnPattern):
@@ -693,9 +689,19 @@ class Isogeo2xlsx(Workbook):
                     # print(cell.style)
                     cell.style = v.style
 
-    def tunning_worksheets(self):
-        """Automate"""
+    def tunning_worksheets(self, excluded_sheets: tuple = ("dashboard",)):
+        """Applies some adjustments to the sheets of the workbook: filters, frozen panels,
+        print settings, etc.
+
+        :param tuple excluded_sheets: sheets name to be excluded from the tunning.
+        """
         for sheet in self.worksheets:
+            # exclude specified sheets
+            if sheet.title in [self.tr.get(i, "") for i in excluded_sheets]:
+                logger.debug(
+                    "'{}' sheet has been exclude from the tunning.".format(sheet.title)
+                )
+                continue
             # Freezing panes
             c_freezed = sheet["B2"]
             sheet.freeze_panes = c_freezed

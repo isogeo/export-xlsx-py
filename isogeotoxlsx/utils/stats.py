@@ -22,8 +22,12 @@
 from collections import Counter, defaultdict
 import logging
 
+# submodule
+from isogeotoxlsx.i18n import I18N_EN, I18N_FR
+
 # 3rd party library
-from openpyxl.chart import BarChart, Reference
+from openpyxl.chart import PieChart, Reference
+from openpyxl.chart.series import DataPoint
 from openpyxl.worksheet.worksheet import Worksheet
 
 
@@ -46,12 +50,22 @@ class Stats(object):
     md_types_repartition = defaultdict(int)
     md_tags_occurences = defaultdict(int)
 
-    def __init__(self, lang=None):
+    def __init__(self, lang="fr"):
         """Instanciate stats class."""
         # self._ = _
         super(Stats, self).__init__()
 
-    def attributes(self, all_attributes: list, ws_attributes: Worksheet):
+        # LOCALE
+        if lang.lower() == "fr":
+            self.dates_fmt = "DD/MM/YYYY"
+            self.locale_fmt = "fr_FR"
+            self.tr = I18N_FR
+        else:
+            self.dates_fmt = "YYYY/MM/DD"
+            self.locale_fmt = "uk_UK"
+            self.tr = I18N_EN
+
+    def attributes(self, ws_attributes: Worksheet, all_attributes: list):
         """Perform feature attributes analisis and write results into the
         dedicatedWworksheet."""
         idx_fa = 1
@@ -94,33 +108,37 @@ class Stats(object):
 
     #     return "weekly baby!"
 
-    # def type_pie(self, sheet, total=20):
-    #     """Return histogram data to represent cataloging activity per week."""
-    #     data = (
-    #         (_("Type"), _("Count")),
-    #         (_("Vector"), self.md_types_repartition.get("vector", 0)),
-    #         (_("Raster"), self.md_types_repartition.get("raster", 0)),
-    #         (_("Service"), self.md_types_repartition.get("service", 0)),
-    #         (_("Resource"), self.md_types_repartition.get("resource", 0)),
-    #     )
+    def metadata_types(self, ws: Worksheet, types_counters: dict = None):
+        """Return histogram data to represent cataloging activity per week."""
+        if types_counters is None:
+            types_counters = self.md_types_repartition
 
-    #     # write data into worksheet
-    #     for row in data:
-    #         sheet.append(row)
+        # build the data for pie chart
+        data = (
+            (self.tr.get("type"), self.tr.get("occurrences")),
+            (self.tr.get("vector"), self.md_types_repartition.get("vector", 0)),
+            (self.tr.get("raster"), self.md_types_repartition.get("raster", 0)),
+            (self.tr.get("service"), self.md_types_repartition.get("service", 0)),
+            (self.tr.get("resource"), self.md_types_repartition.get("resource", 0)),
+        )
 
-    #     # Pie chart
-    #     pie = PieChart()
-    #     labels = Reference(sheet, min_col=1, min_row=2, max_row=5)
-    #     data = Reference(sheet, min_col=2, min_row=1, max_row=5)
-    #     pie.add_data(data, titles_from_data=True)
-    #     pie.set_categories(labels)
-    #     pie.title = _("Metadata by types")
+        # write data into worksheet
+        for row in data:
+            ws.append(row)
 
-    #     # Cut the first slice out of the pie
-    #     slice = DataPoint(idx=0, explosion=20)
-    #     pie.series[0].data_points = [slice]
+        # Pie chart
+        pie = PieChart()
+        labels = Reference(ws, min_col=1, min_row=2, max_row=5)
+        data = Reference(ws, min_col=2, min_row=1, max_row=5)
+        pie.add_data(data, titles_from_data=True)
+        pie.set_categories(labels)
+        pie.title = self.tr.get("type") + "s"
 
-    #     return pie
+        # Cut the first slice out of the pie
+        slice = DataPoint(idx=0, explosion=20)
+        pie.series[0].data_points = [slice]
+
+        ws.add_chart(pie, "D1")
 
     # def keywords_bar(self, sheet, results, total=20):
     #     """Return histogram data to represent cataloging activity per week."""
