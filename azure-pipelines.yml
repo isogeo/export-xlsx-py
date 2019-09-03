@@ -44,6 +44,8 @@ jobs:
   dependsOn: 'Lint'
   pool:
     vmImage: "windows-2019"
+  variables:
+    - group: QA
 
   steps:
   - task: UsePythonVersion@0
