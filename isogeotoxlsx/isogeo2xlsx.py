@@ -21,7 +21,7 @@ from urllib.parse import urlparse
 from isogeo_pysdk import IsogeoUtils, Metadata, Share
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, NamedStyle
-from openpyxl.utils import get_column_letter
+from openpyxl.utils import column_index_from_string, get_column_letter
 from openpyxl.worksheet.worksheet import Worksheet
 
 # custom submodules
@@ -285,22 +285,23 @@ class Isogeo2xlsx(Workbook):
             self.idx_v += 1
             self.store_md_generic(metadata, self.ws_v, self.idx_v)
             self.stats.md_types_repartition["vector"] += 1
-            self.store_md_vector(metadata, self.ws_v, self.idx_v)
+            # self.store_md_vector(metadata, self.ws_v, self.idx_v)
+            self.row_height(self.ws_v)
         elif metadata.type == "rasterDataset":
             self.idx_r += 1
             self.store_md_generic(metadata, self.ws_r, self.idx_r)
             self.stats.md_types_repartition["raster"] += 1
-            self.store_md_raster(metadata, self.ws_r, self.idx_r)
+            self.row_height(self.ws_v)
         elif metadata.type == "service":
             self.idx_s += 1
             self.store_md_generic(metadata, self.ws_s, self.idx_s)
             self.stats.md_types_repartition["service"] += 1
-            self.store_md_service(metadata, self.ws_s, self.idx_s)
+            self.row_height(self.ws_v)
         elif metadata.type == "resource":
             self.idx_rz += 1
             self.store_md_generic(metadata, self.ws_rz, self.idx_rz)
             self.stats.md_types_repartition["resource"] += 1
-            self.store_md_resource(metadata, self.ws_rz, self.idx_rz)
+            self.row_height(self.ws_v)
         else:
             logger.error(
                 "Type of metadata is not recognized/handled: {}".format(metadata.type)
@@ -614,7 +615,6 @@ class Isogeo2xlsx(Workbook):
         """
 
         # STYLING
-        ws.row_dimensions[idx].height = 35  # line height - see #52
         ws["C{}".format(idx)].style = "wrap"
         ws["F{}".format(idx)].style = "wrap"
         ws["G{}".format(idx)].style = "wrap"
@@ -643,7 +643,6 @@ class Isogeo2xlsx(Workbook):
         """
 
         # STYLING
-        ws.row_dimensions[idx].height = 35  # line height - see #52
         ws["C{}".format(idx)].style = "wrap"
         ws["F{}".format(idx)].style = "wrap"
         ws["G{}".format(idx)].style = "wrap"
@@ -670,7 +669,6 @@ class Isogeo2xlsx(Workbook):
         """
 
         # STYLING
-        ws.row_dimensions[idx].height = 35  # line height - see #52
         ws["C{}".format(idx)].style = "wrap"
         ws["F{}".format(idx)].style = "wrap"
         ws["M{}".format(idx)].style = "wrap"
@@ -691,7 +689,6 @@ class Isogeo2xlsx(Workbook):
         """
 
         # STYLING
-        ws.row_dimensions[idx].height = 35  # line height - see #52
         ws["C{}".format(idx)].style = "wrap"
         ws["F{}".format(idx)].style = "wrap"
         ws["M{}".format(idx)].style = "wrap"
@@ -757,6 +754,17 @@ class Isogeo2xlsx(Workbook):
         for row_cols in ws.iter_cols(min_row=1, max_row=1):
             for cell in row_cols:
                 cell.style = "Headline 2"
+
+    def row_height(self, ws: Worksheet, from_row: int = 2, height: int = 35):
+        """Set the height of the rows of the passed worksheet.
+
+        :param Worksheet ws: worksheet into write headers
+        :param int from_row: row to start from. Default to '2' = ignoring headers.
+        :param int height: fixed height to apply. Default to 35.
+        """
+        # apply heigth - see #52
+        for i in range(from_row, ws.max_row + 1):
+            ws.row_dimensions[i].height = height
 
     def tunning_worksheets(self):
         """Automate"""
