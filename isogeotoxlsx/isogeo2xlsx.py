@@ -748,7 +748,7 @@ class Isogeo2xlsx(Workbook):
         :param ColumnPattern columns: column table
         """
         # wrap
-        for k, v in columns.items():
+        for v in columns.values():
             # ignore empties columns
             if v.letter is None or v.style is None:
                 continue
