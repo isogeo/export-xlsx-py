@@ -46,6 +46,7 @@ logger = logging.getLogger("isogeotoxlsx")
 class Stats(object):
     """Doc for Isogeo."""
 
+    data_formats = []
     md_empty_fields = defaultdict(list)
     md_types_repartition = defaultdict(int)
     md_tags_occurences = defaultdict(int)
@@ -67,7 +68,11 @@ class Stats(object):
 
     def attributes(self, ws_attributes: Worksheet, all_attributes: list):
         """Perform feature attributes analisis and write results into the
-        dedicatedWworksheet."""
+        wanted worksheet.
+
+        :param Worksheet ws_attributes: sheet of a Workbook to write analisis
+        :param list all_attributes: list of all feature attributes. It's a list of dicts.
+        """
         idx_fa = 1
         # local arrays
         fa_names = []
@@ -97,19 +102,86 @@ class Stats(object):
             ws["A{}".format(idx_fa)] = fa
             ws["B{}".format(idx_fa)] = frq_names.get(fa)
 
-    # def fillfull(self):
-    #     """Calculate fields fillfull level."""
-    #     return "HOHOHOHO"
+    def source_formats(
+        self,
+        ws: Worksheet,
+        li_formats: list = None,
+        cell_start_table: str = "A20",
+        cell_start_chart: str = "D20",
+    ):
+        """Calculates metadata types repartition and add a Pie chart to the wanted sheet of Workbook.
 
-    # def week_work(self, search_results=list):
-    #     """Return histogram data to represent cataloging activity per week."""
-    #     for md in search_results:
-    #         print(md.get("type", "No md, no type"))
+        :param Worksheet ws: sheet of a Workbook to write analisis
+        :param list li_formats: list of all formats labels. If not specified, the class attribute will be used instaed
+        :param str cell_start_table: cell of the sheet where to start writing table
+        :param str cell_start_chart: cell of the sheet where to start writing the chart
+        """
+        if li_formats is None:
+            li_formats = self.data_formats
 
-    #     return "weekly baby!"
+        # build the data for pie chart
+        data = Counter(li_formats)
 
-    def metadata_types(self, ws: Worksheet, types_counters: dict = None):
-        """Return histogram data to represent cataloging activity per week."""
+        # get starting cells
+        min_cell_start_table = ws[cell_start_table]
+
+        # write headers
+        ws.cell(
+            row=min_cell_start_table.row,
+            column=min_cell_start_table.column,
+            value=self.tr.get("format"),
+        )
+        ws.cell(
+            row=min_cell_start_table.row,
+            column=min_cell_start_table.column + 1,
+            value=self.tr.get("occurrences"),
+        )
+
+        # write data into worksheet
+        row = min_cell_start_table.row
+        for frmt, count in data.items():
+            row += 1
+            ws.cell(row=row, column=min_cell_start_table.column, value=frmt.title())
+            ws.cell(row=row, column=min_cell_start_table.column + 1, value=count)
+
+        # Pie chart
+        pie = PieChart()
+        labels = Reference(
+            worksheet=ws,
+            min_col=min_cell_start_table.column,
+            min_row=min_cell_start_table.row + 1,
+            max_row=row,
+        )
+        data = Reference(
+            worksheet=ws,
+            min_col=min_cell_start_table.column + 1,
+            min_row=min_cell_start_table.row + 1,
+            max_row=row,
+        )
+        pie.add_data(data)
+        pie.set_categories(labels)
+        pie.title = self.tr.get("format") + "s"
+
+        # Cut the first slice out of the pie
+        slice = DataPoint(idx=0, explosion=20)
+        pie.series[0].data_points = [slice]
+
+        ws.add_chart(pie, cell_start_chart)
+
+    def metadata_types(
+        self,
+        ws: Worksheet,
+        types_counters: dict = None,
+        cell_start_table: str = "A1",
+        cell_start_chart: str = "D1",
+    ):
+        """Calculates metadata types repartition and add a Pie chart to the wanted sheet of Workbook.
+
+        :param Worksheet ws: sheet of a Workbook to write analisis
+        :param dict types_counters: dictionary of types/count. If not specified, the class attribute will be used instaed
+        :param str cell_start_table: cell of the sheet where to start writing table
+        :param str cell_start_chart: cell of the sheet where to start writing the chart
+        """
         if types_counters is None:
             types_counters = self.md_types_repartition
 
@@ -138,53 +210,7 @@ class Stats(object):
         slice = DataPoint(idx=0, explosion=20)
         pie.series[0].data_points = [slice]
 
-        ws.add_chart(pie, "D1")
-
-    # def keywords_bar(self, sheet, results, total=20):
-    #     """Return histogram data to represent cataloging activity per week."""
-    #     # tags parsing
-    #     li_keywords = []
-    #     li_inspire = []
-    #     for md in results:
-    #         li_keywords.extend(
-    #             (
-    #                 i.get("text")
-    #                 for i in md.get("keywords", [])
-    #                 if i.get("_tag").startswith("keyword:is")
-    #             )
-    #         )
-    #         li_inspire.extend(
-    #             (
-    #                 i.get("text")
-    #                 for i in md.get("keywords", [])
-    #                 if i.get("_tag").startswith("keyword:in")
-    #             )
-    #         )
-    #     keywords = Counter(li_keywords)
-    #     inspire = Counter(li_inspire)
-
-    #     data_k = [("Keyword", "Count")]
-    #     for k, c in keywords.most_common(50):
-    #         data_k.append((k, c))
-
-    #     # write data into worksheet
-    #     for row in data_k:
-    #         sheet.append(row)
-
-    #     bar = BarChart()
-    #     bar.type = "bar"
-    #     bar.style = 10
-    #     bar.title = "Keywords by occurrences"
-    #     bar.y_axis.title = "Occurences"
-    #     bar.x_axis.title = "Keywords"
-
-    #     data = Reference(sheet, min_col=2, min_row=1, max_row=50, max_col=3)
-    #     cats = Reference(sheet, min_col=1, min_row=2, max_row=50)
-    #     bar.add_data(data, titles_from_data=True)
-    #     bar.set_categories(cats)
-    #     bar.shape = 4
-
-    #     return bar
+        ws.add_chart(pie, cell_start_chart)
 
 
 # ############################################################################
@@ -192,35 +218,42 @@ class Stats(object):
 # ###################################
 if __name__ == "__main__":
     """Standalone execution and tests."""
-    from os import environ
-    from isogeo_pysdk import Isogeo, __version__ as pysdk_version
     from openpyxl import Workbook
 
-    # API access
-    share_id = environ.get("ISOGEO_API_DEV_ID")
-    share_token = environ.get("ISOGEO_API_DEV_SECRET")
-    isogeo = Isogeo(client_id=share_id, client_secret=share_token)
-    bearer = isogeo.connect()
-
-    # search
-    search = isogeo.search(bearer, whole_results=0, include=["keywords"])
-
+    # this module
+    app = Stats()
     # workbook
     wb = Workbook()
-    # ws = wb.active
 
-    # this app
-    app = Stats()
-    # app.week_work(search.get("results"))
-    # print(type(app.fillfull()))
+    # types of metadatas
+    ws_types = wb.create_sheet(title="Types")
+    app.md_types_repartition = {
+        "raster": 50,
+        "resource": 10,
+        "service": 40,
+        "vector": 100,
+    }
 
-    # metadata types
-    ws_d = wb.create_sheet(title="Dashboard")
-    # # pie = app.type_pie(ws_d,
-    #                    search.get('total'))
-    # # ws_d.add_chart(pie, "D1")
+    app.metadata_types(ws_types)
 
-    bar = app.keywords_bar(ws_d, search.get("results"))
-    ws_d.add_chart(bar, "A10")
+    # formats of source datasets
+    ws_formats = wb.create_sheet(title="Formats")
+    app.data_formats = [
+        "PostGIS",
+        "WFS",
+        "PostGIS",
+        "WMS",
+        "Esri Shapefiles",
+        "Esri Shapefiles",
+        "Esri Shapefiles",
+        "Esri Shapefiles",
+        "Esri Shapefiles",
+    ]
+
+    app.source_formats(
+        ws_formats,
+        # cell_start_table="A"  # you can specify where to write table
+    )
+
     # write xlsx
-    wb.save("test.xlsx")
+    wb.save("test_stats_charts.xlsx")
