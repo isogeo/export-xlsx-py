@@ -322,6 +322,10 @@ class Isogeo2xlsx(Workbook):
         # special analisis
         if hasattr(self, "ws_fa"):
             self.analisis_attributes()
+            # style it
+            self.column_width(self.ws_fa, self.columns_attributes)
+            self.row_height(self.ws_fa)
+            self.styling_cells(self.ws_fa, self.columns_attributes)
 
     def store_md_generic(self, md: Metadata, ws: Worksheet, idx: int):
         """Exports generic metadata attributes into Excel worksheet with some dynamic
