@@ -320,7 +320,7 @@ class Isogeo2xlsx(Workbook):
             )
 
         # special analisis
-        if self.idx_fa:
+        if hasattr(self, "ws_fa"):
             self.analisis_attributes()
 
     def store_md_generic(self, md: Metadata, ws: Worksheet, idx: int):
