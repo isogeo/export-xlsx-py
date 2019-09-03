@@ -13,6 +13,7 @@
 I18N_EN = {
     # worksheets
     "attributes": "Feature Attributes",
+    "dashboard": "Dashboard",
     "raster": "Rasters",
     "resource": "Ressources",
     "service": "Services",
