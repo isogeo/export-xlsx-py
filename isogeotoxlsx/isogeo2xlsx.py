@@ -287,21 +287,25 @@ class Isogeo2xlsx(Workbook):
             self.stats.md_types_repartition["vector"] += 1
             # self.store_md_vector(metadata, self.ws_v, self.idx_v)
             self.row_height(self.ws_v)
+            self.styling_cells(self.ws_v, self.columns_vector)
         elif metadata.type == "rasterDataset":
             self.idx_r += 1
             self.store_md_generic(metadata, self.ws_r, self.idx_r)
             self.stats.md_types_repartition["raster"] += 1
             self.row_height(self.ws_v)
+            self.styling_cells(self.ws_v, self.columns_vector)
         elif metadata.type == "service":
             self.idx_s += 1
             self.store_md_generic(metadata, self.ws_s, self.idx_s)
             self.stats.md_types_repartition["service"] += 1
             self.row_height(self.ws_v)
+            self.styling_cells(self.ws_v, self.columns_vector)
         elif metadata.type == "resource":
             self.idx_rz += 1
             self.store_md_generic(metadata, self.ws_rz, self.idx_rz)
             self.stats.md_types_repartition["resource"] += 1
             self.row_height(self.ws_v)
+            self.styling_cells(self.ws_v, self.columns_vector)
         else:
             logger.error(
                 "Type of metadata is not recognized/handled: {}".format(metadata.type)
@@ -419,13 +423,11 @@ class Isogeo2xlsx(Workbook):
             ws["{}{}".format(col.get("validFrom").letter, idx)] = utils.hlpr_datetimes(
                 md.validFrom
             )
-            ws["{}{}".format(col.get("validFrom").letter, idx)].style = "date"
 
         if md.validTo:
             ws["{}{}".format(col.get("validTo").letter, idx)] = utils.hlpr_datetimes(
                 md.validTo
             )
-            ws["{}{}".format(col.get("validTo").letter, idx)].style = "date"
 
         if md.updateFrequency:
             ws[
@@ -442,7 +444,6 @@ class Isogeo2xlsx(Workbook):
             ws["{}{}".format(col.get("created").letter, idx)] = utils.hlpr_datetimes(
                 md.created
             )
-            ws["{}{}".format(col.get("created").letter, idx)].style = "date"
 
         # events count
         if md.events:
@@ -453,7 +454,6 @@ class Isogeo2xlsx(Workbook):
             ws["{}{}".format(col.get("modified").letter, idx)] = utils.hlpr_datetimes(
                 md.modified
             )
-            ws["{}{}".format(col.get("modified").letter, idx)].style = "date"
 
         # -- TECHNICAL -----------------------------------------------------------------
         # format
@@ -589,17 +589,14 @@ class Isogeo2xlsx(Workbook):
             ws["{}{}".format(col.get("_created").letter, idx)] = utils.hlpr_datetimes(
                 md._created
             )
-            ws["{}{}".format(col.get("_created").letter, idx)].style = "date"
 
         # last update
         if md._modified:
             ws["{}{}".format(col.get("_modified").letter, idx)] = utils.hlpr_datetimes(
                 md._modified
             )
-            ws["{}{}".format(col.get("_modified").letter, idx)].style = "date"
 
         # edit
-        # ws["{}{}".format(col.get("linkEdit").letter, idx)] = md.admin_url(self.url_base_edit) + "identification"
         ws["{}{}".format(col.get("linkEdit").letter, idx)] = utils.get_edit_url(md)
         if self.share is not None:
             link_visu = utils.get_view_url(
@@ -765,6 +762,26 @@ class Isogeo2xlsx(Workbook):
         # apply heigth - see #52
         for i in range(from_row, ws.max_row + 1):
             ws.row_dimensions[i].height = height
+
+    def styling_cells(self, ws: Worksheet, columns: ColumnPattern):
+        """Applies the referenced style to the cells of a column.
+
+        :param Worksheet ws: worksheet into write headers
+        :param ColumnPattern columns: column table
+        """
+        # wrap
+        for k, v in columns.items():
+            # ignore empties columns
+            if v.letter is None or v.style is None:
+                continue
+            # apply wrap style depending on value
+            col_idx = column_index_from_string(v.letter)
+            for row_cols in ws.iter_rows(
+                min_row=2, min_col=col_idx, max_col=col_idx
+            ):
+                for cell in row_cols:
+                    # print(cell.style)
+                    cell.style = v.style
 
     def tunning_worksheets(self):
         """Automate"""
