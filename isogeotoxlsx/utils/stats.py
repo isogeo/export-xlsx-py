@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-from __future__ import absolute_import, print_function, unicode_literals
+
 
 # ----------------------------------------------------------------------------
 # Name:         OpenCatalog to Excel
@@ -24,6 +24,7 @@ import logging
 
 # 3rd party library
 from openpyxl.chart import BarChart, Reference
+from openpyxl.worksheet.worksheet import Worksheet
 
 
 # ##############################################################################
@@ -50,16 +51,48 @@ class Stats(object):
         # self._ = _
         super(Stats, self).__init__()
 
-    def fillfull(self):
-        """Calculate fields fillfull level."""
-        return "HOHOHOHO"
+    def attributes(self, all_attributes: list, ws_attributes: Worksheet):
+        """Perform feature attributes analisis and write results into the
+        dedicatedWworksheet."""
+        idx_fa = 1
+        # local arrays
+        fa_names = []
+        # fa_types = []
+        # fa_alias = []
+        # fa_descr = []
 
-    def week_work(self, search_results=list):
-        """Return histogram data to represent cataloging activity per week."""
-        for md in search_results:
-            print(md.get("type", "No md, no type"))
+        # parsing
+        for dico_fa in all_attributes:
+            for fa in dico_fa:
+                fa_names.append(fa.get("name"))
+                # fa_alias.append(fa.get("alias", "NR"))
+                # fa_types.append(fa.get("dataType"))
+                # fa_descr.append(fa.get("description", "NR"))
+                del fa
 
-        return "weekly baby!"
+        # stats
+        frq_names = Counter(fa_names)
+        # frq_alias = Counter(fa_alias)
+        # frq_types = Counter(fa_types)
+        # frq_descr = Counter(fa_descr)
+
+        # write
+        ws = ws_attributes
+        for fa in frq_names:
+            idx_fa += 1
+            ws["A{}".format(idx_fa)] = fa
+            ws["B{}".format(idx_fa)] = frq_names.get(fa)
+
+    # def fillfull(self):
+    #     """Calculate fields fillfull level."""
+    #     return "HOHOHOHO"
+
+    # def week_work(self, search_results=list):
+    #     """Return histogram data to represent cataloging activity per week."""
+    #     for md in search_results:
+    #         print(md.get("type", "No md, no type"))
+
+    #     return "weekly baby!"
 
     # def type_pie(self, sheet, total=20):
     #     """Return histogram data to represent cataloging activity per week."""
@@ -89,51 +122,51 @@ class Stats(object):
 
     #     return pie
 
-    def keywords_bar(self, sheet, results, total=20):
-        """Return histogram data to represent cataloging activity per week."""
-        # tags parsing
-        li_keywords = []
-        li_inspire = []
-        for md in results:
-            li_keywords.extend(
-                (
-                    i.get("text")
-                    for i in md.get("keywords", [])
-                    if i.get("_tag").startswith("keyword:is")
-                )
-            )
-            li_inspire.extend(
-                (
-                    i.get("text")
-                    for i in md.get("keywords", [])
-                    if i.get("_tag").startswith("keyword:in")
-                )
-            )
-        keywords = Counter(li_keywords)
-        inspire = Counter(li_inspire)
+    # def keywords_bar(self, sheet, results, total=20):
+    #     """Return histogram data to represent cataloging activity per week."""
+    #     # tags parsing
+    #     li_keywords = []
+    #     li_inspire = []
+    #     for md in results:
+    #         li_keywords.extend(
+    #             (
+    #                 i.get("text")
+    #                 for i in md.get("keywords", [])
+    #                 if i.get("_tag").startswith("keyword:is")
+    #             )
+    #         )
+    #         li_inspire.extend(
+    #             (
+    #                 i.get("text")
+    #                 for i in md.get("keywords", [])
+    #                 if i.get("_tag").startswith("keyword:in")
+    #             )
+    #         )
+    #     keywords = Counter(li_keywords)
+    #     inspire = Counter(li_inspire)
 
-        data_k = [("Keyword", "Count")]
-        for k, c in keywords.most_common(50):
-            data_k.append((k, c))
+    #     data_k = [("Keyword", "Count")]
+    #     for k, c in keywords.most_common(50):
+    #         data_k.append((k, c))
 
-        # write data into worksheet
-        for row in data_k:
-            sheet.append(row)
+    #     # write data into worksheet
+    #     for row in data_k:
+    #         sheet.append(row)
 
-        bar = BarChart()
-        bar.type = "bar"
-        bar.style = 10
-        bar.title = "Keywords by occurrences"
-        bar.y_axis.title = "Occurences"
-        bar.x_axis.title = "Keywords"
+    #     bar = BarChart()
+    #     bar.type = "bar"
+    #     bar.style = 10
+    #     bar.title = "Keywords by occurrences"
+    #     bar.y_axis.title = "Occurences"
+    #     bar.x_axis.title = "Keywords"
 
-        data = Reference(sheet, min_col=2, min_row=1, max_row=50, max_col=3)
-        cats = Reference(sheet, min_col=1, min_row=2, max_row=50)
-        bar.add_data(data, titles_from_data=True)
-        bar.set_categories(cats)
-        bar.shape = 4
+    #     data = Reference(sheet, min_col=2, min_row=1, max_row=50, max_col=3)
+    #     cats = Reference(sheet, min_col=1, min_row=2, max_row=50)
+    #     bar.add_data(data, titles_from_data=True)
+    #     bar.set_categories(cats)
+    #     bar.shape = 4
 
-        return bar
+    #     return bar
 
 
 # ############################################################################

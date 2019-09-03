@@ -319,14 +319,6 @@ class Isogeo2xlsx(Workbook):
                 "Type of metadata is not recognized/handled: {}".format(metadata.type)
             )
 
-        # special analisis
-        if hasattr(self, "ws_fa"):
-            self.analisis_attributes()
-            # style it
-            self.column_width(self.ws_fa, self.columns_attributes)
-            self.row_height(self.ws_fa)
-            self.styling_cells(self.ws_fa, self.columns_attributes)
-
     def store_md_generic(self, md: Metadata, ws: Worksheet, idx: int):
         """Exports generic metadata attributes into Excel worksheet with some dynamic
         adaptations based on metadata type.
@@ -629,36 +621,17 @@ class Isogeo2xlsx(Workbook):
         )
 
     # ------------ Analisis --------------------------------------------------
-    def analisis_attributes(self):
-        """Perform feature attributes analisis and write results into the
-        dedicatedWworksheet."""
-        # local arrays
-        fa_names = []
-        fa_types = []
-        fa_alias = []
-        fa_descr = []
+    def launch_analisis(self):
+        # special analisis
+        if hasattr(self, "ws_fa"):
+            self.stats.attributes(all_attributes=self.fa_all, ws_attributes=self.ws_fa)
+            # style it
+            self.column_width(self.ws_fa, self.columns_attributes)
+            self.row_height(self.ws_fa)
+            self.styling_cells(self.ws_fa, self.columns_attributes)
 
-        # parsing
-        for dico_fa in self.fa_all:
-            for fa in dico_fa:
-                fa_names.append(fa.get("name"))
-                # fa_alias.append(fa.get("alias", "NR"))
-                # fa_types.append(fa.get("dataType"))
-                # fa_descr.append(fa.get("description", "NR"))
-                del fa
-
-        # stats
-        frq_names = Counter(fa_names)
-        frq_alias = Counter(fa_alias)
-        frq_types = Counter(fa_types)
-        frq_descr = Counter(fa_descr)
-
-        # write
-        ws = self.ws_fa
-        for fa in frq_names:
-            self.idx_fa += 1
-            ws["A{}".format(self.idx_fa)] = fa
-            ws["B{}".format(self.idx_fa)] = frq_names.get(fa)
+        if hasattr(self, "ws_d"):
+            print("youpi")
 
     # ------------ Customize worksheet ----------------------------------------
     def headers_writer(self, ws: Worksheet, columns: ColumnPattern):
@@ -813,20 +786,21 @@ if __name__ == "__main__":
 
     isogeo.close()  # close session
 
-    print(
-        "{}/{} metadata ready to be exported.".format(len(search.results), search.total)
-    )
+    print("{}/{} metadata to be exported.".format(len(search.results), search.total))
 
     # instanciate th final workbook
     out_workbook = Isogeo2xlsx(
         lang=isogeo.lang, url_base_edit=isogeo.app_url, url_base_view=isogeo.oc_url
     )
     # add needed worksheets
-    out_workbook.set_worksheets(auto=search.tags.keys(), attributes=1)
+    out_workbook.set_worksheets(auto=search.tags.keys(), attributes=1, dashboard=1)
 
     # parse search results
     for md in map(Metadata.clean_attributes, search.results):
         out_workbook.store_metadatas(md)
+
+    # launch analisis
+    out_workbook.launch_analisis()
 
     # apply filters
     out_workbook.tunning_worksheets()
