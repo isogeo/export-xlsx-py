@@ -607,30 +607,9 @@ class Isogeo2xlsx(Workbook):
         # lang
         ws["{}{}".format(col.get("language").letter, idx)] = md.language
 
-    def store_md_vector(self, md: Metadata, ws: Worksheet, idx: int):
-        """ TO DOCUMENT
-        """
-
-        # STYLING
-        ws["C{}".format(idx)].style = "wrap"
-        ws["F{}".format(idx)].style = "wrap"
-        ws["G{}".format(idx)].style = "wrap"
-        ws["I{}".format(idx)].style = "wrap"
-        ws["J{}".format(idx)].style = "wrap"
-        ws["K{}".format(idx)].style = "date"
-        ws["L{}".format(idx)].style = "date"
-        ws["U{}".format(idx)].style = "wrap"
-        ws["AA{}".format(idx)].style = "wrap"
-        ws["AB{}".format(idx)].style = "wrap"
-        ws["AC{}".format(idx)].style = "wrap"
-        ws["AD{}".format(idx)].style = "wrap"
-        ws["AE{}".format(idx)].style = "wrap"
-        ws["AG{}".format(idx)].style = "wrap"
-        ws["AH{}".format(idx)].style = "wrap"
-
-        # LOG
+        # log
         logger.info(
-            "Vector metadata stored: {} ({})".format(
+            "Metadata stored: {} ({})".format(
                 md.title_or_name(slugged=1), md._id
             )
         )
