@@ -614,46 +614,6 @@ class Isogeo2xlsx(Workbook):
             )
         )
 
-    def store_md_service(self, md: Metadata, ws: Worksheet, idx: int):
-        """ TO DOCUMENT
-        """
-
-        # STYLING
-        ws["C{}".format(idx)].style = "wrap"
-        ws["F{}".format(idx)].style = "wrap"
-        ws["M{}".format(idx)].style = "wrap"
-        ws["N{}".format(idx)].style = "wrap"
-        ws["O{}".format(idx)].style = "wrap"
-        ws["P{}".format(idx)].style = "wrap"
-        ws["R{}".format(idx)].style = "wrap"
-        ws["S{}".format(idx)].style = "wrap"
-
-        # LOG
-        logger.info("Service metadata stored: {} ({})".format(md.name, md._id))
-
-        # end of method
-        return
-
-    def store_md_resource(self, md: Metadata, ws: Worksheet, idx: int):
-        """ TO DOCUMENT
-        """
-
-        # STYLING
-        ws["C{}".format(idx)].style = "wrap"
-        ws["F{}".format(idx)].style = "wrap"
-        ws["M{}".format(idx)].style = "wrap"
-        ws["N{}".format(idx)].style = "wrap"
-        ws["O{}".format(idx)].style = "wrap"
-        ws["P{}".format(idx)].style = "wrap"
-        ws["R{}".format(idx)].style = "wrap"
-        ws["S{}".format(idx)].style = "wrap"
-
-        # LOG
-        logger.info("Resource metadata stored: {} ({})".format(md.name, md._id))
-
-        # end of method
-        return
-
     # ------------ Analisis --------------------------------------------------
     def analisis_attributes(self):
         """Perform feature attributes analisis and write results into the
