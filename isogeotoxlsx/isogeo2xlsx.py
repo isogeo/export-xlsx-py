@@ -716,9 +716,8 @@ class Isogeo2xlsx(Workbook):
     def headers_writer(self, ws: Worksheet, columns: ColumnPattern):
         """Writes the headers from a columns ref table to a worksheet.
 
-        Arguments:
-            ws {Worksheet} -- worksheet into write headers
-            columns {ColumnPattern} -- column table
+        :param Worksheet ws: worksheet into write headers
+        :param ColumnPattern columns: column table
         """
         # text
         for k, v in columns.items():
