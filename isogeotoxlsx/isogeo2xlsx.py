@@ -463,10 +463,12 @@ class Isogeo2xlsx(Workbook):
             ws["{}{}".format(col.get("format").letter, idx)] = "{0} ({1} - {2})".format(
                 format_lbl, md.formatVersion, md.encoding
             )
+            self.stats.data_formats.append(format_lbl)
         elif md.format:
             ws["{}{}".format(col.get("format").letter, idx)] = "{0} {1}".format(
                 md.format, md.formatVersion
             )
+            self.stats.data_formats.append(md.format)
         else:
             pass
 
@@ -627,6 +629,7 @@ class Isogeo2xlsx(Workbook):
 
         if hasattr(self, "ws_d"):
             self.stats.metadata_types(self.ws_d)
+            self.stats.source_formats(self.ws_d)
             logger.info("Dashboard sheet has been added.")
 
     # ------------ Customize worksheet ----------------------------------------
