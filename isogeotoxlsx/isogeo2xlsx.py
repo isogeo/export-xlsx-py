@@ -21,7 +21,7 @@ from urllib.parse import urlparse
 from isogeo_pysdk import IsogeoUtils, Metadata, Share
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, NamedStyle
-from openpyxl.utils import get_column_letter
+from openpyxl.utils import column_index_from_string, get_column_letter
 from openpyxl.worksheet.worksheet import Worksheet
 
 # custom submodules
@@ -286,22 +286,34 @@ class Isogeo2xlsx(Workbook):
             self.idx_v += 1
             self.store_md_generic(metadata, self.ws_v, self.idx_v)
             self.stats.md_types_repartition["vector"] += 1
-            self.store_md_vector(metadata, self.ws_v, self.idx_v)
+            # style it
+            self.column_width(self.ws_v, self.columns_vector)
+            self.row_height(self.ws_v)
+            self.styling_cells(self.ws_v, self.columns_vector)
         elif metadata.type == "rasterDataset":
             self.idx_r += 1
             self.store_md_generic(metadata, self.ws_r, self.idx_r)
             self.stats.md_types_repartition["raster"] += 1
-            self.store_md_raster(metadata, self.ws_r, self.idx_r)
+            # style it
+            self.column_width(self.ws_r, self.columns_raster)
+            self.row_height(self.ws_r)
+            self.styling_cells(self.ws_r, self.columns_raster)
         elif metadata.type == "service":
             self.idx_s += 1
             self.store_md_generic(metadata, self.ws_s, self.idx_s)
             self.stats.md_types_repartition["service"] += 1
-            self.store_md_service(metadata, self.ws_s, self.idx_s)
+            # style it
+            self.column_width(self.ws_s, self.columns_service)
+            self.row_height(self.ws_s)
+            self.styling_cells(self.ws_s, self.columns_service)
         elif metadata.type == "resource":
             self.idx_rz += 1
             self.store_md_generic(metadata, self.ws_rz, self.idx_rz)
             self.stats.md_types_repartition["resource"] += 1
-            self.store_md_resource(metadata, self.ws_rz, self.idx_rz)
+            # style it
+            self.column_width(self.ws_rz, self.columns_resource)
+            self.row_height(self.ws_rz)
+            self.styling_cells(self.ws_rz, self.columns_resource)
         else:
             logger.error(
                 "Type of metadata is not recognized/handled: {}".format(metadata.type)
@@ -423,13 +435,11 @@ class Isogeo2xlsx(Workbook):
             ws["{}{}".format(col.get("validFrom").letter, idx)] = utils.hlpr_datetimes(
                 md.validFrom
             )
-            ws["{}{}".format(col.get("validFrom").letter, idx)].style = "date"
 
         if md.validTo:
             ws["{}{}".format(col.get("validTo").letter, idx)] = utils.hlpr_datetimes(
                 md.validTo
             )
-            ws["{}{}".format(col.get("validTo").letter, idx)].style = "date"
 
         if md.updateFrequency:
             ws[
@@ -446,7 +456,6 @@ class Isogeo2xlsx(Workbook):
             ws["{}{}".format(col.get("created").letter, idx)] = utils.hlpr_datetimes(
                 md.created
             )
-            ws["{}{}".format(col.get("created").letter, idx)].style = "date"
 
         # events count
         if md.events:
@@ -457,7 +466,6 @@ class Isogeo2xlsx(Workbook):
             ws["{}{}".format(col.get("modified").letter, idx)] = utils.hlpr_datetimes(
                 md.modified
             )
-            ws["{}{}".format(col.get("modified").letter, idx)].style = "date"
 
         # -- TECHNICAL -----------------------------------------------------------------
         # format
@@ -593,17 +601,14 @@ class Isogeo2xlsx(Workbook):
             ws["{}{}".format(col.get("_created").letter, idx)] = utils.hlpr_datetimes(
                 md._created
             )
-            ws["{}{}".format(col.get("_created").letter, idx)].style = "date"
 
         # last update
         if md._modified:
             ws["{}{}".format(col.get("_modified").letter, idx)] = utils.hlpr_datetimes(
                 md._modified
             )
-            ws["{}{}".format(col.get("_modified").letter, idx)].style = "date"
 
         # edit
-        # ws["{}{}".format(col.get("linkEdit").letter, idx)] = md.admin_url(self.url_base_edit) + "identification"
         ws["{}{}".format(col.get("linkEdit").letter, idx)] = utils.get_edit_url(md)
         if self.share is not None:
             link_visu = utils.get_view_url(
@@ -614,103 +619,10 @@ class Isogeo2xlsx(Workbook):
         # lang
         ws["{}{}".format(col.get("language").letter, idx)] = md.language
 
-    def store_md_vector(self, md: Metadata, ws: Worksheet, idx: int):
-        """ TO DOCUMENT
-        """
-
-        # STYLING
-        ws.row_dimensions[idx].height = 35  # line height - see #52
-        ws["C{}".format(idx)].style = "wrap"
-        ws["F{}".format(idx)].style = "wrap"
-        ws["G{}".format(idx)].style = "wrap"
-        ws["I{}".format(idx)].style = "wrap"
-        ws["J{}".format(idx)].style = "wrap"
-        ws["K{}".format(idx)].style = "date"
-        ws["L{}".format(idx)].style = "date"
-        ws["U{}".format(idx)].style = "wrap"
-        ws["AA{}".format(idx)].style = "wrap"
-        ws["AB{}".format(idx)].style = "wrap"
-        ws["AC{}".format(idx)].style = "wrap"
-        ws["AD{}".format(idx)].style = "wrap"
-        ws["AE{}".format(idx)].style = "wrap"
-        ws["AG{}".format(idx)].style = "wrap"
-        ws["AH{}".format(idx)].style = "wrap"
-
-        # LOG
+        # log
         logger.info(
-            "Vector metadata stored: {} ({})".format(
-                md.title_or_name(slugged=1), md._id
-            )
+            "Metadata stored: {} ({})".format(md.title_or_name(slugged=1), md._id)
         )
-
-    def store_md_raster(self, md: Metadata, ws: Worksheet, idx: int):
-        """ TO DOCUMENT
-        """
-
-        # STYLING
-        ws.row_dimensions[idx].height = 35  # line height - see #52
-        ws["C{}".format(idx)].style = "wrap"
-        ws["F{}".format(idx)].style = "wrap"
-        ws["G{}".format(idx)].style = "wrap"
-        ws["I{}".format(idx)].style = "wrap"
-        ws["J{}".format(idx)].style = "wrap"
-        ws["K{}".format(idx)].style = "date"
-        ws["L{}".format(idx)].style = "date"
-        ws["U{}".format(idx)].style = "wrap"
-        ws["X{}".format(idx)].style = "wrap"
-        ws["Y{}".format(idx)].style = "wrap"
-        ws["Z{}".format(idx)].style = "wrap"
-        ws["AA{}".format(idx)].style = "wrap"
-        ws["AC{}".format(idx)].style = "wrap"
-        ws["AD{}".format(idx)].style = "wrap"
-
-        # LOG
-        logger.info("Raster metadata stored: {} ({})".format(md.name, md._id))
-
-        # end of method
-        return
-
-    def store_md_service(self, md: Metadata, ws: Worksheet, idx: int):
-        """ TO DOCUMENT
-        """
-
-        # STYLING
-        ws.row_dimensions[idx].height = 35  # line height - see #52
-        ws["C{}".format(idx)].style = "wrap"
-        ws["F{}".format(idx)].style = "wrap"
-        ws["M{}".format(idx)].style = "wrap"
-        ws["N{}".format(idx)].style = "wrap"
-        ws["O{}".format(idx)].style = "wrap"
-        ws["P{}".format(idx)].style = "wrap"
-        ws["R{}".format(idx)].style = "wrap"
-        ws["S{}".format(idx)].style = "wrap"
-
-        # LOG
-        logger.info("Service metadata stored: {} ({})".format(md.name, md._id))
-
-        # end of method
-        return
-
-    def store_md_resource(self, md: Metadata, ws: Worksheet, idx: int):
-        """ TO DOCUMENT
-        """
-
-        # STYLING
-        ws.row_dimensions[idx].height = 35  # line height - see #52
-        ws["C{}".format(idx)].style = "wrap"
-        ws["F{}".format(idx)].style = "wrap"
-        ws["M{}".format(idx)].style = "wrap"
-        ws["N{}".format(idx)].style = "wrap"
-        ws["O{}".format(idx)].style = "wrap"
-        ws["P{}".format(idx)].style = "wrap"
-        ws["R{}".format(idx)].style = "wrap"
-        ws["S{}".format(idx)].style = "wrap"
-
-        # LOG
-        logger.info("Resource metadata stored: {} ({})".format(md.name, md._id))
-
-        # end of method
-        return
 
     # ------------ Analisis --------------------------------------------------
     def analisis_attributes(self):
@@ -744,13 +656,12 @@ class Isogeo2xlsx(Workbook):
             ws["A{}".format(self.idx_fa)] = fa
             ws["B{}".format(self.idx_fa)] = frq_names.get(fa)
 
-    # ------------ CustomizeWworksheet ----------------------------------------
+    # ------------ Customize worksheet ----------------------------------------
     def headers_writer(self, ws: Worksheet, columns: ColumnPattern):
         """Writes the headers from a columns ref table to a worksheet.
 
-        Arguments:
-            ws {Worksheet} -- worksheet into write headers
-            columns {ColumnPattern} -- column table
+        :param Worksheet ws: worksheet into write headers
+        :param ColumnPattern columns: column table
         """
         # text
         for k, v in columns.items():
@@ -762,6 +673,48 @@ class Isogeo2xlsx(Workbook):
         for row_cols in ws.iter_cols(min_row=1, max_row=1):
             for cell in row_cols:
                 cell.style = "Headline 2"
+
+    def column_width(self, ws: Worksheet, columns: ColumnPattern):
+        """Set the width of the columns of the passed worksheet.
+
+        :param Worksheet ws: worksheet into write headers
+        :param ColumnPattern columns: column table
+        """
+        # apply heigth - see #52
+        for v in columns.values():
+            # ignore empties columns
+            if v.letter is None or v.width is None:
+                continue
+            ws.column_dimensions[v.letter].width = v.width
+
+    def row_height(self, ws: Worksheet, from_row: int = 2, height: int = 35):
+        """Set the height of the rows of the passed worksheet.
+
+        :param Worksheet ws: worksheet into write headers
+        :param int from_row: row to start from. Default to '2' = ignoring headers.
+        :param int height: fixed height to apply. Default to 35.
+        """
+        # apply heigth - see #52
+        for i in range(from_row, ws.max_row + 1):
+            ws.row_dimensions[i].height = height
+
+    def styling_cells(self, ws: Worksheet, columns: ColumnPattern):
+        """Applies the referenced style to the cells of a column.
+
+        :param Worksheet ws: worksheet into write headers
+        :param ColumnPattern columns: column table
+        """
+        # wrap
+        for v in columns.values():
+            # ignore empties columns
+            if v.letter is None or v.style is None:
+                continue
+            # apply wrap style depending on value
+            col_idx = column_index_from_string(v.letter)
+            for row_cols in ws.iter_rows(min_row=2, min_col=col_idx, max_col=col_idx):
+                for cell in row_cols:
+                    # print(cell.style)
+                    cell.style = v.style
 
     def tunning_worksheets(self):
         """Automate"""
@@ -850,7 +803,7 @@ if __name__ == "__main__":
 
     search = isogeo.search(
         whole_results=0,
-        query="owner:{}".format(WORKGROUP_TEST_FIXTURE_UUID),
+        # query="owner:{}".format(WORKGROUP_TEST_FIXTURE_UUID),
         include="all",
     )
 
@@ -870,6 +823,9 @@ if __name__ == "__main__":
     # parse search results
     for md in map(Metadata.clean_attributes, search.results):
         out_workbook.store_metadatas(md)
+
+    # apply filters
+    out_workbook.tunning_worksheets()
 
     # save file
     out_workbook.save("test_isogeo_export_to_xlsx.xlsx")

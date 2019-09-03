@@ -9,34 +9,34 @@
 # ############ Globals ############
 # #################################
 RESOURCE_COLUMNS = {
-    "_created": ("T", 0),
-    "_creator": ("D", 0),
-    "_id": ("S", 0),
-    "_modified": ("U", 0),
-    "abstract": ("B", 0),
-    "conditions": ("K", 0),
-    "contacts": ("M", 0),
-    "created": ("F", 0),
-    "format": ("J", 0),
-    "keywords": ("E", 0),
-    "language": ("V", 0),
-    "limitations": ("L", 0),
-    "links": (None, 0),
-    "modified": ("H", 0),
-    "name": ("Z", 0),
-    "path": ("C", 0),
-    "published": ("I", 0),
-    "specifications": ("AB", 0),
-    "tags": (None, 0),
-    "title": ("A", 0),
+    "_created": ("T", "date", 15),
+    "_creator": ("D", None, 30),
+    "_id": ("S", None, 15),
+    "_modified": ("U", "date", 15),
+    "abstract": ("B", "wrap", 50),
+    "conditions": ("K", "wrap", 15),
+    "contacts": ("M", None, 15),
+    "created": ("F", "date", 15),
+    "format": ("J", None, 15),
+    "keywords": ("E", "wrap", 15),
+    "language": ("V", None, 15),
+    "limitations": ("L", "wrap", 15),
+    "links": (None, None, 15),
+    "modified": ("H", "date", 15),
+    "name": ("Z", None, 15),
+    "path": ("C", None, 15),
+    "published": ("I", "date", 15),
+    "specifications": ("AB", "wrap", 15),
+    "tags": (None, None, 15),
+    "title": ("A", None, 50),
     # specific
-    "hasLinkDownload": ("N", 0),
-    "hasLinkOther": ("P", 0),
-    "hasLinkView": ("O", 0),
-    "linkEdit": ("Q", 0),
-    "linkView": ("R", 0),
-    "inspireConformance": ("Y", 0),
-    "inspireThemes": ("X", 0),
+    "hasLinkDownload": ("N", None, 15),
+    "hasLinkOther": ("P", None, 15),
+    "hasLinkView": ("O", None, 15),
+    "linkEdit": ("Q", None, 15),
+    "linkView": ("R", None, 15),
+    "inspireConformance": ("Y", None, 15),
+    "inspireThemes": ("X", "wrap", 15),
 }
 
 # #############################################################################
@@ -53,4 +53,4 @@ if __name__ == "__main__":
     columns_vector = {k: Column._make(v) for k, v in RESOURCE_COLUMNS.items()}
     # check
     print(isinstance(columns_vector, dict))
-    print(isinstance(columns_vector.get("title"), Column))
+    print(isinstance(columns_vector.get("title", 15), Column))
