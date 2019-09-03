@@ -12,6 +12,7 @@
 
 I18N_EN = {
     # worksheets
+    "attributes": "Feature Attributes",
     "raster": "Rasters",
     "resource": "Ressources",
     "service": "Services",
@@ -70,7 +71,7 @@ I18N_EN = {
     "linkView": "See online",
     "inspireConformance": "INSPIRE conformance",
     "inspireThemes": "INSPIRE themes",
-    "occurrences": "# hits",
+    "occurrences": "Hits",
 }
 
 # #############################################################################

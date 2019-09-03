@@ -28,6 +28,7 @@ from openpyxl.worksheet.worksheet import Worksheet
 from isogeotoxlsx.i18n import I18N_EN, I18N_FR
 from isogeotoxlsx.matrix import (
     ColumnPattern,
+    ATTRIBUTES_COLUMNS,
     RASTER_COLUMNS,
     RESOURCE_COLUMNS,
     SERVICE_COLUMNS,
@@ -54,8 +55,6 @@ class Isogeo2xlsx(Workbook):
     :param str url_base_edit: base url to format edit links (basically app.isogeo.com)
     :param str url_base_view: base url to format view links (basically open.isogeo.com)
     """
-
-    cols_fa = ["Nom", "Occurrences"]  # A  # B
 
     def __init__(
         self, lang: str = "FR", url_base_edit: str = "", url_base_view: str = ""
@@ -220,16 +219,18 @@ class Isogeo2xlsx(Workbook):
             logger.info("Vectors sheet added")
             # feature attributes analisis
             if attributes:
-                self.ws_fa = self.create_sheet(title="Attributs")
+                # columns matching table
+                self.columns_attributes = {
+                    k: ColumnPattern._make(v) for k, v in ATTRIBUTES_COLUMNS.items()
+                }
+                # create worksheet
+                self.ws_fa = self.create_sheet(title=self.tr.get("attributes"))
+                # set index
                 self.idx_fa = 1
                 self.fa_all = []
                 # headers
-                self.ws_fa.append([i for i in self.cols_fa])
-                # styling
-                for i in self.cols_fa:
-                    self.ws_fa.cell(
-                        row=1, column=self.cols_fa.index(i) + 1
-                    ).style = "Headline 2"
+                self.headers_writer(ws=self.ws_fa, columns=self.columns_attributes)
+                # log
                 logger.info("Feature attributes sheet added")
             else:
                 pass
@@ -317,6 +318,10 @@ class Isogeo2xlsx(Workbook):
             logger.error(
                 "Type of metadata is not recognized/handled: {}".format(metadata.type)
             )
+
+        # special analisis
+        if self.idx_fa:
+            self.analisis_attributes()
 
     def store_md_generic(self, md: Metadata, ws: Worksheet, idx: int):
         """Exports generic metadata attributes into Excel worksheet with some dynamic
@@ -813,7 +818,7 @@ if __name__ == "__main__":
         lang=isogeo.lang, url_base_edit=isogeo.app_url, url_base_view=isogeo.oc_url
     )
     # add needed worksheets
-    out_workbook.set_worksheets(auto=search.tags.keys())
+    out_workbook.set_worksheets(auto=search.tags.keys(), attributes=1)
 
     # parse search results
     for md in map(Metadata.clean_attributes, search.results):
