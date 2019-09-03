@@ -614,32 +614,6 @@ class Isogeo2xlsx(Workbook):
             )
         )
 
-    def store_md_raster(self, md: Metadata, ws: Worksheet, idx: int):
-        """ TO DOCUMENT
-        """
-
-        # STYLING
-        ws["C{}".format(idx)].style = "wrap"
-        ws["F{}".format(idx)].style = "wrap"
-        ws["G{}".format(idx)].style = "wrap"
-        ws["I{}".format(idx)].style = "wrap"
-        ws["J{}".format(idx)].style = "wrap"
-        ws["K{}".format(idx)].style = "date"
-        ws["L{}".format(idx)].style = "date"
-        ws["U{}".format(idx)].style = "wrap"
-        ws["X{}".format(idx)].style = "wrap"
-        ws["Y{}".format(idx)].style = "wrap"
-        ws["Z{}".format(idx)].style = "wrap"
-        ws["AA{}".format(idx)].style = "wrap"
-        ws["AC{}".format(idx)].style = "wrap"
-        ws["AD{}".format(idx)].style = "wrap"
-
-        # LOG
-        logger.info("Raster metadata stored: {} ({})".format(md.name, md._id))
-
-        # end of method
-        return
-
     def store_md_service(self, md: Metadata, ws: Worksheet, idx: int):
         """ TO DOCUMENT
         """
@@ -712,7 +686,7 @@ class Isogeo2xlsx(Workbook):
             ws["A{}".format(self.idx_fa)] = fa
             ws["B{}".format(self.idx_fa)] = frq_names.get(fa)
 
-    # ------------ CustomizeWworksheet ----------------------------------------
+    # ------------ Customize worksheet ----------------------------------------
     def headers_writer(self, ws: Worksheet, columns: ColumnPattern):
         """Writes the headers from a columns ref table to a worksheet.
 
