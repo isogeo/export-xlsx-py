@@ -41,7 +41,7 @@ setup(
     license="LGPL3",
     url="https://github.com/isogeo/export-xlsx-py",
     project_urls={
-        "Docs": "https://isogeo-api-pysdk.readthedocs.io/",
+        "Docs": "https://isogeo-export-xlsx-py.readthedocs.io/",
         "Bug Reports": "https://github.com/isogeo/export-xlsx-py/issues/",
         "Source": "https://github.com/isogeo/export-xlsx-py/",
     },

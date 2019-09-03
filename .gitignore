@@ -116,9 +116,9 @@ secret.ini
 !.env.example
 
 # samples
-isogeo_pysdk/samples/_output/*
-isogeo_pysdk/samples/*.json
-isogeo_pysdk/samples/*.xml
+isogeotoxlsx/samples/_output/*
+isogeotoxlsx/samples/*.json
+isogeotoxlsx/samples/*.xml
 
 # virtual environments
 *venv*
