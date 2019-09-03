@@ -869,5 +869,8 @@ if __name__ == "__main__":
     for md in map(Metadata.clean_attributes, search.results):
         out_workbook.store_metadatas(md)
 
+    # apply filters
+    out_workbook.tunning_worksheets()
+
     # save file
     out_workbook.save("test_isogeo_export_to_xlsx.xlsx")
