@@ -609,9 +609,7 @@ class Isogeo2xlsx(Workbook):
 
         # log
         logger.info(
-            "Metadata stored: {} ({})".format(
-                md.title_or_name(slugged=1), md._id
-            )
+            "Metadata stored: {} ({})".format(md.title_or_name(slugged=1), md._id)
         )
 
     # ------------ Analisis --------------------------------------------------
@@ -688,9 +686,7 @@ class Isogeo2xlsx(Workbook):
                 continue
             # apply wrap style depending on value
             col_idx = column_index_from_string(v.letter)
-            for row_cols in ws.iter_rows(
-                min_row=2, min_col=col_idx, max_col=col_idx
-            ):
+            for row_cols in ws.iter_rows(min_row=2, min_col=col_idx, max_col=col_idx):
                 for cell in row_cols:
                     # print(cell.style)
                     cell.style = v.style
@@ -782,7 +778,7 @@ if __name__ == "__main__":
 
     search = isogeo.search(
         whole_results=0,
-        query="owner:{}".format(WORKGROUP_TEST_FIXTURE_UUID),
+        # query="owner:{}".format(WORKGROUP_TEST_FIXTURE_UUID),
         include="all",
     )
 
