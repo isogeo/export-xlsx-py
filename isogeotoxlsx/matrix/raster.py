@@ -40,7 +40,7 @@ RASTER_COLUMNS = {
     "operations": (None, None),
     "path": ("D", None),
     "precision": (None, None),
-    "published": (None, None),
+    "published": (None, "date"),
     "scale": ("X", None),
     "series": (None, None),
     "serviceLayers": (None, None),

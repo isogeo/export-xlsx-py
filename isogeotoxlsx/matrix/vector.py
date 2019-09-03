@@ -40,7 +40,7 @@ VECTOR_COLUMNS = {
     "operations": (None, None),
     "path": ("D", None),
     "precision": (None, None),
-    "published": ("R", None),
+    "published": ("R", "date"),
     "scale": ("X", None),
     "series": (None, None),
     "serviceLayers": (None, None),
