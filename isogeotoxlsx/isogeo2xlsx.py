@@ -463,12 +463,12 @@ class Isogeo2xlsx(Workbook):
             ws["{}{}".format(col.get("format").letter, idx)] = "{0} ({1} - {2})".format(
                 format_lbl, md.formatVersion, md.encoding
             )
-            self.stats.data_formats.append(format_lbl)
+            self.stats.li_data_formats.append(format_lbl)
         elif md.format:
             ws["{}{}".format(col.get("format").letter, idx)] = "{0} {1}".format(
                 md.format, md.formatVersion
             )
-            self.stats.data_formats.append(md.format)
+            self.stats.li_data_formats.append(md.format)
         else:
             pass
 
@@ -592,12 +592,21 @@ class Isogeo2xlsx(Workbook):
             ws["{}{}".format(col.get("_created").letter, idx)] = utils.hlpr_datetimes(
                 md._created
             )
+            # add creation date (not datetime) for later stats
+            self.stats.li_dates_md_created.append(
+                utils.hlpr_datetimes(md._created).date()
+            )
 
         # last update
         if md._modified:
             ws["{}{}".format(col.get("_modified").letter, idx)] = utils.hlpr_datetimes(
                 md._modified
             )
+            # add modification date (not datetime) for later stats, only if different from the creation date
+            if md._modified != md._created:
+                self.stats.li_dates_md_modified.append(
+                    utils.hlpr_datetimes(md._modified).date()
+                )
 
         # edit
         ws["{}{}".format(col.get("linkEdit").letter, idx)] = utils.get_edit_url(md)
@@ -630,6 +639,7 @@ class Isogeo2xlsx(Workbook):
         if hasattr(self, "ws_d"):
             self.stats.pie_types(self.ws_d)
             self.stats.pie_formats(self.ws_d)
+            self.stats.line_dates(self.ws_d)
             logger.info("Dashboard sheet has been added.")
 
     # ------------ Customize worksheet ----------------------------------------

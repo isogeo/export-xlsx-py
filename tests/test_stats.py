@@ -17,6 +17,7 @@
 # ##################################
 
 # Standard library
+from datetime import date
 import unittest
 
 # 3rd party
@@ -63,7 +64,7 @@ class TestStats(unittest.TestCase):
 
         # formats of source datasets
         ws_formats = wb.create_sheet(title="Formats")
-        app.data_formats = [
+        app.li_data_formats = [
             "PostGIS",
             "WFS",
             "PostGIS",
@@ -80,8 +81,50 @@ class TestStats(unittest.TestCase):
             # cell_start_table="A"  # you can specify where to write table
         )
 
+        # creation and modification dates
+        ws_history = wb.create_sheet(title="History")
+        app.li_dates_md_created = [
+            date(2019, 1, 1),
+            date(2019, 2, 1),
+            date(2019, 1, 12),
+            date(2019, 1, 12),
+            date(2019, 1, 12),
+            date(2019, 2, 14),
+            date(2019, 2, 14),
+            date(2019, 2, 14),
+            date(2019, 2, 14),
+            date(2019, 2, 28),
+            date(2019, 3, 1),
+            date(2019, 3, 2),
+            date(2019, 3, 3),
+            date(2019, 3, 4),
+            date(2019, 3, 5),
+            date(2019, 3, 5),
+        ]
+
+        app.li_dates_md_modified = [
+            date(2019, 1, 1),
+            date(2019, 2, 1),
+            date(2019, 1, 12),
+            date(2019, 3, 12),
+            date(2019, 3, 12),
+            date(2019, 3, 12),
+            date(2019, 3, 12),
+            date(2019, 3, 12),
+            date(2019, 4, 12),
+            date(2019, 2, 14),
+            date(2019, 2, 28),
+            date(2019, 3, 1),
+            date(2019, 3, 2),
+            date(2019, 3, 3),
+            date(2019, 2, 4),
+            date(2019, 2, 5),
+        ]
+
+        app.line_dates(ws=ws_history, cell_start_table="A1", cell_start_chart="E1")
+
         # write xlsx
-        wb.save("test_stats_charts.xlsx")
+        wb.save("test__unit_stats_charts.xlsx")
 
 
 # #############################################################################
