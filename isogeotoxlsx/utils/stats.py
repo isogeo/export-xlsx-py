@@ -186,23 +186,53 @@ class Stats(object):
             types_counters = self.md_types_repartition
 
         # build the data for pie chart
-        data = (
-            (self.tr.get("type"), self.tr.get("occurrences")),
-            (self.tr.get("vector"), self.md_types_repartition.get("vector", 0)),
-            (self.tr.get("raster"), self.md_types_repartition.get("raster", 0)),
-            (self.tr.get("service"), self.md_types_repartition.get("service", 0)),
-            (self.tr.get("resource"), self.md_types_repartition.get("resource", 0)),
+        # data = {
+        #     self.tr.get("type"): self.tr.get("occurrences"),
+        #     self.tr.get("raster"): self.md_types_repartition.get("raster", 0),
+        #     self.tr.get("resource"): self.md_types_repartition.get("resource", 0),
+        #     self.tr.get("service"): self.md_types_repartition.get("service", 0),
+        #     self.tr.get("vector"): self.md_types_repartition.get("vector", 0),
+        # }
+
+        # get starting cells
+        min_cell_start_table = ws[cell_start_table]
+
+        # write headers
+        ws.cell(
+            row=min_cell_start_table.row,
+            column=min_cell_start_table.column,
+            value=self.tr.get("type"),
+        )
+        ws.cell(
+            row=min_cell_start_table.row,
+            column=min_cell_start_table.column + 1,
+            value=self.tr.get("occurrences"),
         )
 
         # write data into worksheet
-        for row in data:
-            ws.append(row)
+        row = min_cell_start_table.row
+        for md_type, count in self.md_types_repartition.items():
+            row += 1
+            ws.cell(
+                row=row, column=min_cell_start_table.column, value=self.tr.get(md_type)
+            )
+            ws.cell(row=row, column=min_cell_start_table.column + 1, value=count)
 
         # Pie chart
         pie = PieChart()
-        labels = Reference(ws, min_col=1, min_row=2, max_row=5)
-        data = Reference(ws, min_col=2, min_row=1, max_row=5)
-        pie.add_data(data, titles_from_data=True)
+        labels = Reference(
+            worksheet=ws,
+            min_col=min_cell_start_table.column,
+            min_row=min_cell_start_table.row + 1,
+            max_row=row,
+        )
+        data = Reference(
+            worksheet=ws,
+            min_col=min_cell_start_table.column + 1,
+            min_row=min_cell_start_table.row + 1,
+            max_row=row,
+        )
+        pie.add_data(data)
         pie.set_categories(labels)
         pie.title = self.tr.get("type") + "s"
 
