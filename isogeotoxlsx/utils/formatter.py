@@ -19,7 +19,6 @@
 
 # Standard library
 import logging
-from urllib.parse import urlparse
 
 # 3rd party library
 from isogeo_pysdk import (
@@ -194,6 +193,32 @@ class Formatter(object):
         # return formatted result
         return specs_out
 
+    def frequency_as_explicit_str(self, update_frequency_code: str) -> str:
+        """Transform 'updateFrequency' code value as an explicit string.
+        See: https://github.com/isogeo/export-xlsx-py/issues/8
+
+        :param str update_frequency_code: update frequency as stored in Isogeo API
+
+        :returns: update frequency as explicit string.
+        :rtype: str
+
+        :Example:
+
+        >>> print(frequency_as_explicit_str("P1D"))
+        >>> "Every 1 day(s)"
+
+        """
+        # remove first letter
+        freq = update_frequency_code[1:]
+        freq_period = freq[-1:]
+        freq_number = freq[:-1]
+
+        return "{} {}".format(
+            # self.isogeo_tr("frequencyTypes", "frequencyUpdateHelp"),
+            freq_number,
+            self.isogeo_tr("frequencyShortTypes", freq_period),
+        )
+
 
 # ###############################################################################
 # ###### Stand alone program ########
@@ -201,3 +226,6 @@ class Formatter(object):
 if __name__ == "__main__":
     """Try me"""
     formatter = Formatter()
+
+    # update frequencies
+    print(formatter.frequency_as_explicit_str("P1D"))
