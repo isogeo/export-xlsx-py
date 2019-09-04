@@ -19,14 +19,16 @@
 # ###############################
 
 # Standard library
-from collections import Counter, defaultdict
+from collections import Counter, defaultdict, namedtuple
+from datetime import date
 import logging
 
 # submodule
 from isogeotoxlsx.i18n import I18N_EN, I18N_FR
 
 # 3rd party library
-from openpyxl.chart import PieChart, Reference
+from openpyxl.chart.axis import DateAxis
+from openpyxl.chart import LineChart, PieChart, Reference
 from openpyxl.chart.series import DataPoint
 from openpyxl.worksheet.worksheet import Worksheet
 
@@ -46,7 +48,9 @@ logger = logging.getLogger("isogeotoxlsx")
 class Stats(object):
     """Doc for Isogeo."""
 
-    data_formats = []
+    li_data_formats = []
+    li_dates_md_created = []
+    li_dates_md_modified = []
     md_empty_fields = defaultdict(list)
     md_types_repartition = defaultdict(int)
     md_tags_occurences = defaultdict(int)
@@ -102,6 +106,131 @@ class Stats(object):
             ws["A{}".format(idx_fa)] = fa
             ws["B{}".format(idx_fa)] = frq_names.get(fa)
 
+    def line_dates(
+        self,
+        ws: Worksheet,
+        li_dates_md_created: list = None,
+        li_dates_md_modified: list = None,
+        cell_start_table: str = "O1",
+        cell_start_chart: str = "S1",
+    ):
+        """Calculates metadata types repartition and add a Pie chart to the wanted sheet of Workbook.
+
+        :param Worksheet ws: sheet of a Workbook to write analisis
+        :param list li_dates_md_created: list of metadatas'creation dates. If not specified, the class attribute will be used instead.
+        :param list li_dates_md_modified: list of metadatas'modification dates. If not specified, the class attribute will be used instead.
+        :param str cell_start_table: cell of the sheet where to start writing table
+        :param str cell_start_chart: cell of the sheet where to start writing the chart
+        """
+        # use passed lists or class ones
+        if li_dates_md_created is None:
+            li_dates_md_created = self.li_dates_md_created
+        if li_dates_md_modified is None:
+            li_dates_md_modified = self.li_dates_md_modified
+
+        # checks length
+        if len(li_dates_md_created) != len(li_dates_md_modified):
+            logger.warning(
+                "Dates lists should have the same length. Creation: {} | Modification: {}".format(
+                    len(li_dates_md_created), len(li_dates_md_modified)
+                )
+            )
+
+        # use a named tuple
+        DateFrequency = namedtuple(
+            "DateFrequency", ["date", "count_md_created", "count_md_modified"]
+        )
+
+        # parse dates
+        count_creation = Counter(li_dates_md_created)
+        count_update = Counter(li_dates_md_modified)
+
+        itr_dates_frequency = []
+        for crea, mod in zip(sorted(count_creation), sorted(count_update)):
+            if crea == mod:
+                itr_dates_frequency.append(
+                    DateFrequency(crea, count_creation.get(crea), count_update.get(mod))
+                )
+            else:
+                itr_dates_frequency.append(
+                    DateFrequency(crea, count_creation.get(crea), 0)
+                )
+                itr_dates_frequency.append(DateFrequency(mod, 0, count_update.get(mod)))
+
+        # get starting cells
+        min_cell_start_table = ws[cell_start_table]
+
+        # write headers
+        ws.cell(
+            row=min_cell_start_table.row,
+            column=min_cell_start_table.column,
+            value=self.tr.get("date", "Date"),
+        )
+        ws.cell(
+            row=min_cell_start_table.row,
+            column=min_cell_start_table.column + 1,
+            value="{} - {}".format(self.tr.get("occurrences"), self.tr.get("_created")),
+        )
+        ws.cell(
+            row=min_cell_start_table.row,
+            column=min_cell_start_table.column + 2,
+            value="{} - {}".format(
+                self.tr.get("occurrences"), self.tr.get("_modified")
+            ),
+        )
+
+        # write data into worksheet
+        row = min_cell_start_table.row
+        for date_freq in itr_dates_frequency:
+            row += 1
+            ws.cell(row=row, column=min_cell_start_table.column, value=date_freq.date)
+            ws.cell(
+                row=row,
+                column=min_cell_start_table.column + 1,
+                value=date_freq.count_md_created,
+            )
+            ws.cell(
+                row=row,
+                column=min_cell_start_table.column + 2,
+                value=date_freq.count_md_modified,
+            )
+
+        # Chart with date axis
+        dates_chart = LineChart()
+
+        labels = Reference(
+            worksheet=ws,
+            min_col=min_cell_start_table.column,
+            min_row=min_cell_start_table.row + 1,
+            max_row=row,
+        )
+        data = Reference(
+            worksheet=ws,
+            min_col=min_cell_start_table.column + 1,
+            max_col=min_cell_start_table.column + 2,
+            min_row=min_cell_start_table.row,
+            max_row=row,
+        )
+
+        dates_chart.add_data(data, titles_from_data=1)
+        dates_chart.set_categories(labels)
+
+        # custom chart
+        dates_chart.title = self.tr.get("date", "Date")
+        # dates_chart.style = 2
+        # dates_chart.smooth = True
+        dates_chart.height = 10  # default is 7.5
+        dates_chart.width = 30  # default is 15
+        dates_chart.y_axis.title = self.tr.get("occurrences")
+        dates_chart.y_axis.crossAx = 500
+        dates_chart.x_axis = DateAxis(crossAx=100)
+        dates_chart.x_axis.number_format = "mmm-y"
+        dates_chart.x_axis.majorTimeUnit = "days"
+        dates_chart.x_axis.title = "Date"
+
+        # insert chart into the worksheet at the specified anchor
+        ws.add_chart(dates_chart, cell_start_chart)
+
     def pie_formats(
         self,
         ws: Worksheet,
@@ -117,7 +246,7 @@ class Stats(object):
         :param str cell_start_chart: cell of the sheet where to start writing the chart
         """
         if li_formats is None:
-            li_formats = self.data_formats
+            li_formats = self.li_data_formats
 
         # build the data for pie chart
         data = Counter(li_formats)
@@ -184,15 +313,6 @@ class Stats(object):
         """
         if types_counters is None:
             types_counters = self.md_types_repartition
-
-        # build the data for pie chart
-        # data = {
-        #     self.tr.get("type"): self.tr.get("occurrences"),
-        #     self.tr.get("raster"): self.md_types_repartition.get("raster", 0),
-        #     self.tr.get("resource"): self.md_types_repartition.get("resource", 0),
-        #     self.tr.get("service"): self.md_types_repartition.get("service", 0),
-        #     self.tr.get("vector"): self.md_types_repartition.get("vector", 0),
-        # }
 
         # get starting cells
         min_cell_start_table = ws[cell_start_table]
@@ -268,7 +388,7 @@ if __name__ == "__main__":
 
     # formats of source datasets
     ws_formats = wb.create_sheet(title="Formats")
-    app.data_formats = [
+    app.li_data_formats = [
         "PostGIS",
         "WFS",
         "PostGIS",
@@ -284,6 +404,48 @@ if __name__ == "__main__":
         ws_formats,
         # cell_start_table="A"  # you can specify where to write table
     )
+
+    # creation and modification dates
+    ws_history = wb.create_sheet(title="History")
+    app.li_dates_md_created = [
+        date(2019, 1, 1),
+        date(2019, 2, 1),
+        date(2019, 1, 12),
+        date(2019, 1, 12),
+        date(2019, 1, 12),
+        date(2019, 2, 14),
+        date(2019, 2, 14),
+        date(2019, 2, 14),
+        date(2019, 2, 14),
+        date(2019, 2, 28),
+        date(2019, 3, 1),
+        date(2019, 3, 2),
+        date(2019, 3, 3),
+        date(2019, 3, 4),
+        date(2019, 3, 5),
+        date(2019, 3, 5),
+    ]
+
+    app.li_dates_md_modified = [
+        date(2019, 1, 1),
+        date(2019, 2, 1),
+        date(2019, 1, 12),
+        date(2019, 3, 12),
+        date(2019, 3, 12),
+        date(2019, 3, 12),
+        date(2019, 3, 12),
+        date(2019, 3, 12),
+        date(2019, 4, 12),
+        date(2019, 2, 14),
+        date(2019, 2, 28),
+        date(2019, 3, 1),
+        date(2019, 3, 2),
+        date(2019, 3, 3),
+        date(2019, 2, 4),
+        date(2019, 2, 5),
+    ]
+
+    app.line_dates(ws=ws_history, cell_start_table="A1", cell_start_chart="E1")
 
     # write xlsx
     wb.save("test_stats_charts.xlsx")
