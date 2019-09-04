@@ -628,8 +628,8 @@ class Isogeo2xlsx(Workbook):
             logger.info("Analisis of feature attributes sheet has been added.")
 
         if hasattr(self, "ws_d"):
-            self.stats.metadata_types(self.ws_d)
-            self.stats.source_formats(self.ws_d)
+            self.stats.pie_types(self.ws_d)
+            self.stats.pie_formats(self.ws_d)
             logger.info("Dashboard sheet has been added.")
 
     # ------------ Customize worksheet ----------------------------------------
