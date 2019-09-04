@@ -170,6 +170,11 @@ class TestFormatter(unittest.TestCase):
         self.assertIsInstance(specs_out, list)
         self.assertIsInstance(specs_no, list)
 
+    def test_update_frequencies(self):
+        """Update frequency formatter."""
+        # update frequencies
+        self.assertEqual(self.fmt.frequency_as_explicit_str("P1D"), "1 jour(s)")
+
 
 # ##############################################################################
 # ##### Stand alone program ########

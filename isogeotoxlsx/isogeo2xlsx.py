@@ -268,6 +268,7 @@ class Isogeo2xlsx(Workbook):
         """Write metadata into the worksheet.
 
         :param Metadata metadata: metadata object to write
+        :param Share share: share to use to build the OpenCatalog URL
         """
         # check input
         if not isinstance(metadata, Metadata):
@@ -433,7 +434,7 @@ class Isogeo2xlsx(Workbook):
         if md.updateFrequency:
             ws[
                 "{}{}".format(col.get("updateFrequency").letter, idx)
-            ] = md.updateFrequency
+            ] = self.fmt.frequency_as_explicit_str(md.updateFrequency)
         if md.validityComment:
             ws[
                 "{}{}".format(col.get("validityComment").letter, idx)

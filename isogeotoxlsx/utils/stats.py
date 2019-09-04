@@ -46,7 +46,10 @@ logger = logging.getLogger("isogeotoxlsx")
 
 
 class Stats(object):
-    """Doc for Isogeo."""
+    """Perform statistics calculations and make Excel charts.
+    
+    :param str lang: selected language for output
+    """
 
     li_data_formats = []
     li_dates_md_created = []
