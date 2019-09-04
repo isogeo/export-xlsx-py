@@ -59,7 +59,7 @@ class TestStats(unittest.TestCase):
             "vector": 100,
         }
 
-        app.metadata_types(ws_types)
+        app.pie_types(ws_types)
 
         # formats of source datasets
         ws_formats = wb.create_sheet(title="Formats")
@@ -75,7 +75,7 @@ class TestStats(unittest.TestCase):
             "Esri Shapefiles",
         ]
 
-        app.source_formats(
+        app.pie_formats(
             ws_formats,
             # cell_start_table="A"  # you can specify where to write table
         )

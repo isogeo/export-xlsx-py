@@ -102,7 +102,7 @@ class Stats(object):
             ws["A{}".format(idx_fa)] = fa
             ws["B{}".format(idx_fa)] = frq_names.get(fa)
 
-    def source_formats(
+    def pie_formats(
         self,
         ws: Worksheet,
         li_formats: list = None,
@@ -168,7 +168,7 @@ class Stats(object):
 
         ws.add_chart(pie, cell_start_chart)
 
-    def metadata_types(
+    def pie_types(
         self,
         ws: Worksheet,
         types_counters: dict = None,
@@ -234,7 +234,7 @@ if __name__ == "__main__":
         "vector": 100,
     }
 
-    app.metadata_types(ws_types)
+    app.pie_types(ws_types)
 
     # formats of source datasets
     ws_formats = wb.create_sheet(title="Formats")
@@ -250,7 +250,7 @@ if __name__ == "__main__":
         "Esri Shapefiles",
     ]
 
-    app.source_formats(
+    app.pie_formats(
         ws_formats,
         # cell_start_table="A"  # you can specify where to write table
     )
