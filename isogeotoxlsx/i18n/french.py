@@ -34,7 +34,7 @@ I18N_FR = {
     "editionProfile": "Source",
     "encoding": "Encodage des données",
     "envelope": "Emprise",
-    "events": "# Mises à jour",
+    "events": "# Evénements",
     "featureAttributes": "Attributs (A-Z)",
     "features": "# objets",
     "format": "Format",
