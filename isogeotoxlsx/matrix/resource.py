@@ -17,6 +17,7 @@ RESOURCE_COLUMNS = {
     "conditions": ("K", "wrap", 15),
     "contacts": ("M", None, 15),
     "created": ("F", "date", 15),
+    "events": ("G", None, 15),
     "format": ("J", None, 15),
     "keywords": ("E", "wrap", 15),
     "language": ("V", None, 15),
