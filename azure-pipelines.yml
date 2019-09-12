@@ -100,14 +100,17 @@ jobs:
     contains(variables['Build.SourceBranch'], 'tags')
 
   steps:
-  - task: GitHubRelease@0
+  - task: GitHubRelease@1
     inputs:
       gitHubConnection: 'github_isogeo'
       repositoryName: 'isogeo/export-xlsx-py'
       action: 'create'
       target: '$(Build.SourceVersion)'
-      tagSource: 'auto'
-      compareWith: 'lastFullRelease'
+      tagSource: 'gitTag'
+      title: '$(Build.SourceVersion)'
+      changeLogCompareToRelease: 'lastFullRelease'
+      changeLogType: 'issueBased'
+
 
   - task: UsePythonVersion@0
     inputs:
