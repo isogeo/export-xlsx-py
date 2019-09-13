@@ -135,14 +135,16 @@ jobs:
       path: $(System.DefaultWorkingDirectory)/dist
       artifact: 'IsogeoToXLSX_$(Build.SourceVersion)'
 
-  - task: GitHubRelease@0
+  - task: GitHubRelease@1
+    continueOnError: true
     inputs:
       gitHubConnection: 'github_isogeo'
       repositoryName: '$(Build.Repository.Name)'
       action: 'create'
       target: '$(Build.SourceVersion)'
       tagSource: 'auto'
-      compareWith: 'lastFullRelease'
+      changeLogCompareToRelease: 'lastFullRelease'
+      changeLogType: 'issueBased'
 
 
   - task: TwineAuthenticate@1
