@@ -152,6 +152,6 @@ jobs:
       pythonUploadServiceConnection: 'PyPi_Isogeo'
 
   - script: |
-      python -m twine upload dist/* --config-file $(PYPIRC_PATH)
+      python -m twine upload dist/* --config-file $(PYPIRC_PATH) --verbose
     continueOnError: true
     displayName: "Upload to PyPi"
