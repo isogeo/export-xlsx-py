@@ -144,7 +144,7 @@ jobs:
       target: '$(Build.SourceVersion)'
       tagSource: 'gitTag'
       changeLogCompareToRelease: 'lastFullRelease'
-      changeLogType: 'issueBased'
+      changeLogType: 'commitBased'
 
 
   - task: TwineAuthenticate@1
