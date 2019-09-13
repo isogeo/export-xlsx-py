@@ -2,7 +2,7 @@
 #! python3
 
 """
-    Get metadatas from Isogeo and store it into a Excel worksheet. 
+    Get metadatas from Isogeo and store it into a Excel worksheet.
 
 """
 
