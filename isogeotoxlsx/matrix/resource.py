@@ -25,7 +25,7 @@ RESOURCE_COLUMNS = {
     "limitations": ("L", "wrap", 15),
     "links": (None, None, 15),
     "modified": ("H", "date", 15),
-    "name": (None, None, 15),
+    "name": ("C", None, 15),
     "path": ("C", None, 15),
     "published": ("I", "date", 15),
     "specifications": (None, "wrap", 15),
