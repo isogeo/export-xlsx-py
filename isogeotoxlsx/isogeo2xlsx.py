@@ -367,12 +367,13 @@ class Isogeo2xlsx(Workbook):
                 logger.debug("Path reachable: {}".format(src_path))
             else:
                 ws["{}{}".format(col.get("path").letter, idx)] = str(src_path.resolve())
-                logger.debug(
-                    "Path not recognized nor reachable: {}".format(str(src_path))
-                )
+                logger.debug("Path unreachable: {}".format(str(src_path)))
         elif md.path and md.type == "service":
             link_path = r'=HYPERLINK("{0}","{1}")'.format(md.path, md.path)
             ws["{}{}".format(col.get("path").letter, idx)] = link_path
+        elif md.path:
+            ws["{}{}".format(col.get("path").letter, idx)] = md.path
+            logger.debug("Path not recognized: {}".format(str(src_path)))
         else:
             pass
 
