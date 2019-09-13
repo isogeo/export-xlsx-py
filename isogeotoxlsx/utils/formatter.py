@@ -26,7 +26,6 @@ from isogeo_pysdk import (
     IsogeoTranslator,
     IsogeoUtils,
     License,
-    Limitation,
     Specification,
 )
 
@@ -44,11 +43,11 @@ utils = IsogeoUtils()
 
 class Formatter(object):
     """Metadata formatter to avoid repeat operations on metadata during export in different formats.
-    
+
     :param str lang: selected language
     :param str output_type: name of output type to format for. Defaults to 'Excel'
     :param tuple default_values: values used to replace missing values. Structure:
-        
+
         (
             str_for_missing_strings_and_integers,
             str_for_missing_dates

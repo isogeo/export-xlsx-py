@@ -47,7 +47,7 @@ logger = logging.getLogger("isogeotoxlsx")
 
 class Stats(object):
     """Perform statistics calculations and make Excel charts.
-    
+
     :param str lang: selected language for output
     """
 

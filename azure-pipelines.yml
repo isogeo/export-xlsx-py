@@ -31,13 +31,20 @@ jobs:
 
   - script: |
       python -m pip install -U pip
-      python -m pip install -U black
+      python -m pip install -U black flake8
     displayName: 'Install black dependencies'
 
   - script: |
       python -m black --target-version=py37 .\isogeotoxlsx
       python -m black --target-version=py37 .\tests
     displayName: 'Apply black code formatting'
+
+  - script: |
+      # stop the build if there are Python syntax errors or undefined names
+      flake8 .\isogeotoxlsx\ --count --select=E9,F63,F7,F82 --show-source --statistics
+      # exit-zero treats all errors as warnings. Tolerance of line length fixed to 100.
+      flake8 .\isogeotoxlsx\ --count --exit-zero --max-complexity=10 --max-line-length=100
+    displayName: "Static code analisis (PEP8 conformance, imports...), using flake8"
 
 # TESTS
 - job: 'Test'
@@ -100,15 +107,6 @@ jobs:
     contains(variables['Build.SourceBranch'], 'tags')
 
   steps:
-  - task: GitHubRelease@0
-    inputs:
-      gitHubConnection: 'github_isogeo'
-      repositoryName: '$(Build.Repository.Name)'
-      action: 'create'
-      target: '$(Build.SourceVersion)'
-      tagSource: 'auto'
-      compareWith: 'lastFullRelease'
-
 
   - task: UsePythonVersion@0
     inputs:
@@ -136,6 +134,18 @@ jobs:
     inputs:
       path: $(System.DefaultWorkingDirectory)/dist
       artifact: 'IsogeoToXLSX_$(Build.SourceVersion)'
+
+  - task: GitHubRelease@1
+    continueOnError: true
+    inputs:
+      gitHubConnection: 'github_isogeo'
+      repositoryName: '$(Build.Repository.Name)'
+      action: 'create'
+      target: '$(Build.SourceVersion)'
+      tagSource: 'auto'
+      changeLogCompareToRelease: 'lastFullRelease'
+      changeLogType: 'issueBased'
+
 
   - task: TwineAuthenticate@1
     inputs:
