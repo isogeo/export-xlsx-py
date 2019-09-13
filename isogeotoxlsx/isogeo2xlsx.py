@@ -482,7 +482,7 @@ class Isogeo2xlsx(Workbook):
             )
 
         # bounding box (envelope)
-        if md.envelope and md.envelope.get("bbox"):
+        if md.type != "resource" and md.envelope and md.envelope.get("bbox"):
             coords = md.envelope.get("coordinates")
             if md.envelope.get("type") == "Polygon":
                 bbox = ",\n".join(
