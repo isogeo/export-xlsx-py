@@ -142,7 +142,7 @@ jobs:
       repositoryName: '$(Build.Repository.Name)'
       action: 'create'
       target: '$(Build.SourceVersion)'
-      tagSource: 'auto'
+      tagSource: 'gitTag'
       changeLogCompareToRelease: 'lastFullRelease'
       changeLogType: 'issueBased'
 
@@ -152,6 +152,6 @@ jobs:
       pythonUploadServiceConnection: 'PyPi_Isogeo'
 
   - script: |
-      python -m twine upload dist/* -r PyPi_Isogeo/pypi --config-file $(PYPIRC_PATH)
+      python -m twine upload dist/* --config-file $(PYPIRC_PATH)
     continueOnError: true
     displayName: "Upload to PyPi"
