@@ -401,9 +401,10 @@ class Isogeo2xlsx(Workbook):
             logger.info("Vector dataset without any keyword or INSPIRE theme")
 
         # INSPIRE conformity
-        ws["{}{}".format(col.get("inspireConformance").letter, idx)] = (
-            "conformity:inspire" in md.tags
-        )
+        if col.get("inspireConformance").letter is not None:
+            ws["{}{}".format(col.get("inspireConformance").letter, idx)] = (
+                "conformity:inspire" in md.tags
+            )
 
         # owner
         ws["{}{}".format(col.get("_creator").letter, idx)] = next(
