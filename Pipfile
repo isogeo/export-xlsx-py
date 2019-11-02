@@ -4,14 +4,14 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-black = "==19.3b0"
+black = "==19.10b0"
 codecov = "*"
 flake8 = "*"
 pip = "*"
 pre-commit = "*"
 pycodestyle = "*"
 pylint = "*"
-pytest= "*"
+pytest= "<5.1"
 pytest-cov="*"
 python-dotenv = "*"
 setuptools = "*"
@@ -21,7 +21,7 @@ sphinx = "*"
 
 
 [packages]
-isogeo-pysdk = "*"
+isogeo-pysdk = "==3.2.*"
 openpyxl = "*"
 
 [requires]
