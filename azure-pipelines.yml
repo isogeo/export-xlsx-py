@@ -146,7 +146,6 @@ jobs:
       changeLogCompareToRelease: 'lastFullRelease'
       changeLogType: 'commitBased'
 
-
   - task: TwineAuthenticate@1
     inputs:
       pythonUploadServiceConnection: 'PyPi_Isogeo'
