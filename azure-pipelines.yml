@@ -149,7 +149,7 @@ jobs:
 
   - task: TwineAuthenticate@1
     inputs:
-      pythonUploadServiceConnection: 'PyPi_Isogeo'
+      pythonUploadServiceConnection: 'pypi'
 
   - script: |
       python -m twine upload dist/* --config-file $(PYPIRC_PATH) --verbose
