@@ -26,7 +26,7 @@ python -m black --target-version=py37 .\tests
 "-- STEP -- Clean up the previous builds"
 rm -r build
 rm -r dist
-rm -r isogeotoxlsx.egg-info
+rm -r .\isogeo_export_xl.egg-info\
 
 # metadata
 "-- STEP -- Prepare package's metadata"
@@ -39,7 +39,7 @@ python setup.py bdist_wheel
 
 # upload
 "-- STEP -- Upload it to pypi"
-twine upload dist/* --config-file .\.pypirc
+twine upload dist/* --config-file .\.pypirc --skip-existing
 
 # remove virtualenv
 "-- STEP -- Get out the virtualenv then remove it"
