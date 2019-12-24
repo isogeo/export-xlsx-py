@@ -770,7 +770,7 @@ if __name__ == "__main__":
 
     # info to the console
     log_console_handler = logging.StreamHandler()
-    log_console_handler.setLevel(logging.INFO)
+    log_console_handler.setLevel(logging.DEBUG)
     log_console_handler.setFormatter(log_format)
 
     logger.addHandler(log_file_handler)
