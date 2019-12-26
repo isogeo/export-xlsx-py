@@ -1,18 +1,15 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 
+"""
+    Statistics Calculator.
+    Perform statistics analisis.
 
-# ----------------------------------------------------------------------------
-# Name:         OpenCatalog to Excel
-# Purpose:      Get metadatas from an Isogeo OpenCatlog and store it into
-#               an Excel workbook.
-#
-# Author:       Isogeo
-#
-# Python:       2.7.x
-# Created:      14/08/2014
-# Updated:      28/01/2016
-# ----------------------------------------------------------------------------
+    Author: Isogeo
+
+    Python: 3.7.x
+    Created: 14/08/2014
+"""
 
 # ###########################################################################
 # ########## Libraries ##########
@@ -21,6 +18,7 @@
 # Standard library
 from collections import Counter, defaultdict, namedtuple
 from datetime import date
+from itertools import zip_longest
 import logging
 
 # submodule
@@ -117,7 +115,8 @@ class Stats(object):
         cell_start_table: str = "O1",
         cell_start_chart: str = "S1",
     ):
-        """Calculates metadata types repartition and add a Pie chart to the wanted sheet of Workbook.
+        """Calculates metadata creation and modification dates repartition and add a \
+            Line chart to the wanted sheet of Workbook.
 
         :param Worksheet ws: sheet of a Workbook to write analisis
         :param list li_dates_md_created: list of metadatas'creation dates. If not specified, the class attribute will be used instead.
@@ -131,13 +130,38 @@ class Stats(object):
         if li_dates_md_modified is None:
             li_dates_md_modified = self.li_dates_md_modified
 
-        # checks length
+        # compare lists
+        # length
         if len(li_dates_md_created) != len(li_dates_md_modified):
             logger.warning(
                 "Dates lists should have the same length. Creation: {} | Modification: {}".format(
                     len(li_dates_md_created), len(li_dates_md_modified)
                 )
             )
+        total_dates = len(set(li_dates_md_created + li_dates_md_modified))
+
+        # common
+        logger.debug(
+            "{}/{} dates with both metadata creation and modification.".format(
+                len(set(li_dates_md_created).intersection(li_dates_md_modified)),
+                total_dates,
+            )
+        )
+
+        # difference
+        logger.debug(
+            "{}/{} dates with only metadata creation.".format(
+                len(set(li_dates_md_created).difference(li_dates_md_modified)),
+                total_dates,
+            )
+        )
+
+        logger.debug(
+            "{}/{} dates with only metadata modification.".format(
+                len(set(li_dates_md_modified).difference(li_dates_md_created)),
+                total_dates,
+            )
+        )
 
         # use a named tuple
         DateFrequency = namedtuple(
@@ -147,12 +171,22 @@ class Stats(object):
         # parse dates
         count_creation = Counter(li_dates_md_created)
         count_update = Counter(li_dates_md_modified)
-
         itr_dates_frequency = []
-        for crea, mod in zip(sorted(count_creation), sorted(count_update)):
+        for crea, mod in zip_longest(
+            sorted(count_creation), sorted(count_update), fillvalue=0
+        ):
             if crea == mod:
+                # means a day with both metadata creation and modification
                 itr_dates_frequency.append(
                     DateFrequency(crea, count_creation.get(crea), count_update.get(mod))
+                )
+            elif crea == 0:
+                print("creation empty: {}".format(count_creation.get(crea)))
+                itr_dates_frequency.append(DateFrequency(mod, 0, count_update.get(mod)))
+            elif mod == 0:
+                print("modification empty: {}".format(count_update.get(mod)))
+                itr_dates_frequency.append(
+                    DateFrequency(crea, count_creation.get(crea), 0)
                 )
             else:
                 itr_dates_frequency.append(
@@ -184,7 +218,7 @@ class Stats(object):
 
         # write data into worksheet
         row = min_cell_start_table.row
-        for date_freq in itr_dates_frequency:
+        for date_freq in sorted(itr_dates_frequency):
             row += 1
             ws.cell(row=row, column=min_cell_start_table.column, value=date_freq.date)
             ws.cell(
@@ -241,7 +275,7 @@ class Stats(object):
         cell_start_table: str = "A20",
         cell_start_chart: str = "D20",
     ):
-        """Calculates metadata types repartition and add a Pie chart to the wanted sheet of Workbook.
+        """Calculates metadata formats repartition and add a Pie chart to the wanted sheet of Workbook.
 
         :param Worksheet ws: sheet of a Workbook to write analisis
         :param list li_formats: list of all formats labels. If not specified, the class attribute will be used instaed
@@ -373,6 +407,9 @@ if __name__ == "__main__":
     """Standalone execution and tests."""
     from openpyxl import Workbook
 
+    # logs for debug
+    logging.basicConfig(level=logging.DEBUG)
+
     # this module
     app = Stats()
     # workbook
@@ -415,38 +452,42 @@ if __name__ == "__main__":
         date(2019, 2, 1),
         date(2019, 1, 12),
         date(2019, 1, 12),
-        date(2019, 1, 12),
+        # date(2019, 1, 12),
         date(2019, 2, 14),
         date(2019, 2, 14),
-        date(2019, 2, 14),
-        date(2019, 2, 14),
+        # date(2019, 2, 14),
+        # date(2019, 2, 14),
         date(2019, 2, 28),
-        date(2019, 3, 1),
-        date(2019, 3, 2),
-        date(2019, 3, 3),
-        date(2019, 3, 4),
-        date(2019, 3, 5),
-        date(2019, 3, 5),
+        # date(2019, 3, 1),
+        # date(2019, 3, 2),
+        # date(2019, 3, 3),
+        # date(2019, 3, 4),
+        # date(2019, 3, 5),
+        # date(2019, 3, 5),
     ]
 
     app.li_dates_md_modified = [
         date(2019, 1, 1),
         date(2019, 2, 1),
         date(2019, 1, 12),
-        date(2019, 3, 12),
-        date(2019, 3, 12),
-        date(2019, 3, 12),
-        date(2019, 3, 12),
-        date(2019, 3, 12),
-        date(2019, 4, 12),
-        date(2019, 2, 14),
-        date(2019, 2, 28),
-        date(2019, 3, 1),
-        date(2019, 3, 2),
+        # date(2019, 3, 12),
+        # date(2019, 3, 12),
+        # date(2019, 3, 12),
+        # date(2019, 3, 12),
+        # date(2019, 3, 12),
+        # date(2019, 4, 12),
+        # date(2019, 2, 14),
+        # date(2019, 2, 28),
+        # date(2019, 3, 1),
+        # date(2019, 3, 2),
         date(2019, 3, 3),
-        date(2019, 2, 4),
-        date(2019, 2, 5),
+        # date(2019, 2, 4),
+        # date(2019, 2, 5),
+        # None
     ]
+
+    # print(app.li_dates_md_created.sort() == app.li_dates_md_modified.sort())
+    # print(list(set(app.li_dates_md_created).intersection(app.li_dates_md_modified)))
 
     app.line_dates(ws=ws_history, cell_start_table="A1", cell_start_chart="E1")
 
