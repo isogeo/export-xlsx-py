@@ -56,9 +56,9 @@ stages:
         displayName: "Static code analisis (PEP8 conformance, imports...), using flake8"
 
         # save formatted code to use later avoiding git clone again
-        - publish: $(System.DefaultWorkingDirectory)
-          artifact: "FORMATTED_$(pyPiPackageName)_$(Build.SourceBranchName)_$(Build.BuildId)"
-          displayName: 'Publish formatted code with dependencies'
+      - publish: $(System.DefaultWorkingDirectory)
+        artifact: "FORMATTED_$(pyPiPackageName)_$(Build.SourceBranchName)_$(Build.BuildId)"
+        displayName: 'Publish formatted code with dependencies'
 
 - stage: Test
   displayName: Unit tests
