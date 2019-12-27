@@ -19,6 +19,7 @@ pr:
 variables:
   packageFolderName: "isogeotoxlsx"
   pyPiPackageName: "isogeo-export-xl"
+  pythonVersion: "3.7"
   vmImageName: "windows-2019"
 
 # -- STAGES ----------------------------------------------------------------------------
@@ -34,7 +35,7 @@ stages:
       steps:
       - task: UsePythonVersion@0
         inputs:
-          versionSpec: '3.7'
+          versionSpec: $(pythonVersion)
           architecture: 'x64'
           addToPath: true
 
@@ -87,7 +88,7 @@ stages:
 
     - task: UsePythonVersion@0
       inputs:
-        versionSpec: '3.7'
+        versionSpec: $(pythonVersion)
         architecture: 'x64'
         addToPath: true
 
@@ -151,7 +152,7 @@ stages:
 
     - task: UsePythonVersion@0
       inputs:
-        versionSpec: '3.x'
+        versionSpec: $(pythonVersion)
         architecture: 'x64'
         addToPath: true
 
@@ -237,6 +238,12 @@ stages:
         buildType: "current"
         artifact: '$(pyPiPackageName)_$(Build.SourceVersion)'
         targetPath: "$(System.DefaultWorkingDirectory)/dist/"
+
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: $(pythonVersion)
+        architecture: 'x64'
+        addToPath: true
 
     - task: TwineAuthenticate@1
       inputs:
