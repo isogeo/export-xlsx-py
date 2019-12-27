@@ -70,6 +70,8 @@ stages:
   - job: 'Test'
     pool:
       vmImage: $(vmImageName)
+    variables:
+      - group: QA
 
     steps:
 
