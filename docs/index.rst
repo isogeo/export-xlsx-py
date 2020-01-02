@@ -33,5 +33,3 @@ Package modules
 
 .. toctree::
     _apidoc/modules
-
-
