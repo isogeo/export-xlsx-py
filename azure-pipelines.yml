@@ -46,7 +46,7 @@ stages:
 
       - script: |
           python -m black --target-version=py37 ./$(packageFolderName)
-          python -m black --target-version=py37 .\tests
+          python -m black --target-version=py37 ./tests
         displayName: 'Apply black code formatting'
 
       - script: |
