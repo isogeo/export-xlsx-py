@@ -29,7 +29,7 @@ from time import gmtime, strftime
 
 # 3rd party
 from dotenv import load_dotenv
-from isogeo_pysdk import Isogeo, MetadataSearch
+from isogeo_pysdk import Isogeo, Metadata, MetadataSearch
 
 # target
 from isogeotoxlsx import Formatter
@@ -122,21 +122,20 @@ class TestFormatter(unittest.TestCase):
     # formatter
     def test_cgus(self):
         """CGU formatter."""
-        licenses = [t for t in self.search.tags if t.startswith("license:")]
-        # filtered search
-        md_cgu = self.isogeo.search(
-            query=sample(licenses, 1)[0],
-            include=("conditions",),
-            page_size=1,
-            whole_results=0,
-        )
         # get conditions reformatted
-        cgus_in = sample(md_cgu.results, 1)[0].get("conditions", [])
-        cgus_out = self.fmt.conditions(cgus_in)
-        cgus_no = self.fmt.conditions([])
-        # test
-        self.assertIsInstance(cgus_out, list)
-        self.assertIsInstance(cgus_no, list)
+        for result in self.search.results:
+            # load result
+            md = Metadata.clean_attributes(result)
+
+            # empty or not, it should work
+            if len(md.conditions):
+                cgus_out = self.fmt.conditions(md.conditions)
+            else:
+                cgus_out = self.fmt.conditions(md.conditions)
+
+            # test
+            self.assertIsInstance(cgus_out, list)
+            self.assertEqual(len(result.get("conditions")), len(cgus_out))
 
     def test_limitations(self):
         """Limitations formatter."""
