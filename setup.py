@@ -46,7 +46,7 @@ setup(
         "Source": "https://github.com/isogeo/export-xlsx-py/",
     },
     # dependencies
-    install_requires=["isogeo-pysdk>=3.2.5,<3.3", "openpyxl==3.0.*"],
+    install_requires=["isogeo-pysdk>=3.2.5,<3.4", "openpyxl==3.0.*"],
     extras_require={
         "dev": ["black", "python-dotenv"],
         "test": ["codecov", "coverage", "pytest", "pytest-cov"],
