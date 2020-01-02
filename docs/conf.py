@@ -228,4 +228,3 @@ def run_apidoc(_):
 # launch setup
 def setup(app):
     app.connect("builder-inited", run_apidoc)
-
