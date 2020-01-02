@@ -175,7 +175,7 @@ stages:
       displayName: 'Publish Artifact: Isogeo XLSX Exporter'
       inputs:
         path: $(System.DefaultWorkingDirectory)/dist
-        artifact: 'IsogeoToXLSX_$(Build.SourceVersion)'
+        artifact: '$(pyPiPackageName)_$(Build.SourceVersion)'
 
   # PUBLISH TO GITHUB
   # only with a tagged commit (see: https://github.com/MicrosoftDocs/vsts-docs/issues/3281)
