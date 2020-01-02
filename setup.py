@@ -17,7 +17,7 @@ import pathlib
 from setuptools import find_packages, setup
 
 # package to get package metadatas
-from isogeo_pysdk import __about__
+from isogeotoxlsx import __about__
 
 # SETUP ######################################################################
 
