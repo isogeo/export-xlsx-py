@@ -55,10 +55,7 @@ class Formatter(object):
     """
 
     def __init__(
-        self,
-        lang="FR",
-        output_type="Excel",
-        default_values=("NR", "1970-01-01T00:00:00+00:00"),
+        self, lang="FR", output_type="Excel",
     ):
         # locale
         self.lang = lang.lower()
@@ -71,14 +68,31 @@ class Formatter(object):
 
         # store params and imports as attributes
         self.output_type = output_type.lower()
-        self.defs = default_values
         self.isogeo_tr = IsogeoTranslator(lang).tr
 
     # ------------ Metadata sections formatter --------------------------------
     def conditions(self, md_cgus: list) -> list:
         """Render input metadata CGUs as a new list.
 
-        :param dict md_cgus: input dictionary extracted from an Isogeo metadata
+        :param list md_cgus: list of conditions extracted from an Isogeo metadata
+
+        :rtype: list
+
+        :Example:
+
+        .. code-block:: python
+
+
+            # make a search including conditions
+            search = isogeo.search(include=("conditions",))
+
+            # parse results
+            for md in search.results:
+                # load metadata as object
+                md = Metadata.clean_attributes(md)
+
+                # format conditions
+                cgus_out = formatter.conditions(md.conditions)
         """
         cgus_out = []
         for c_in in md_cgus:
