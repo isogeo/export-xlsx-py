@@ -16,14 +16,15 @@ setuptools
 wheel
 
 # required
-isogeo-pysdk>=3.2.*
-openpyxl==2.6.*
+isogeo-pysdk>=3.2.5,<3.3
+openpyxl==3.0.*
 
 # development
 black
 flake8
 pre-commit
 pylint
+pytest==5.0.*
 pytest-cov
 python-dotenv
 sphinx

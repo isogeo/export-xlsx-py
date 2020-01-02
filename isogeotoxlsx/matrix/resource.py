@@ -17,16 +17,18 @@ RESOURCE_COLUMNS = {
     "conditions": ("K", "wrap", 15),
     "contacts": ("M", None, 15),
     "created": ("F", "date", 15),
+    "envelope": (None, "wrap", 15),
+    "events": ("G", None, 15),
     "format": ("J", None, 15),
     "keywords": ("E", "wrap", 15),
     "language": ("V", None, 15),
     "limitations": ("L", "wrap", 15),
     "links": (None, None, 15),
     "modified": ("H", "date", 15),
-    "name": ("Z", None, 15),
+    "name": ("C", None, 15),
     "path": ("C", None, 15),
     "published": ("I", "date", 15),
-    "specifications": ("AB", "wrap", 15),
+    "specifications": (None, "wrap", 15),
     "tags": (None, None, 15),
     "title": ("A", None, 50),
     # specific
@@ -35,8 +37,8 @@ RESOURCE_COLUMNS = {
     "hasLinkView": ("O", None, 15),
     "linkEdit": ("Q", None, 15),
     "linkView": ("R", None, 15),
-    "inspireConformance": ("Y", None, 15),
-    "inspireThemes": ("X", "wrap", 15),
+    "inspireConformance": (None, None, 15),
+    "inspireThemes": (None, "wrap", 15),
 }
 
 # #############################################################################

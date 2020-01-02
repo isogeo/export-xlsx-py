@@ -2,7 +2,7 @@
 #! python3
 
 """
-    Get metadatas from Isogeo and store it into a Excel worksheet. 
+    Get metadatas from Isogeo and store it into a Excel worksheet.
 
 """
 
@@ -367,12 +367,13 @@ class Isogeo2xlsx(Workbook):
                 logger.debug("Path reachable: {}".format(src_path))
             else:
                 ws["{}{}".format(col.get("path").letter, idx)] = str(src_path.resolve())
-                logger.debug(
-                    "Path not recognized nor reachable: {}".format(str(src_path))
-                )
+                logger.debug("Path unreachable: {}".format(str(src_path)))
         elif md.path and md.type == "service":
             link_path = r'=HYPERLINK("{0}","{1}")'.format(md.path, md.path)
             ws["{}{}".format(col.get("path").letter, idx)] = link_path
+        elif md.path:
+            ws["{}{}".format(col.get("path").letter, idx)] = md.path
+            logger.debug("Path not recognized: {}".format(str(src_path)))
         else:
             pass
 
@@ -401,9 +402,10 @@ class Isogeo2xlsx(Workbook):
             logger.info("Vector dataset without any keyword or INSPIRE theme")
 
         # INSPIRE conformity
-        ws["{}{}".format(col.get("inspireConformance").letter, idx)] = (
-            "conformity:inspire" in md.tags
-        )
+        if col.get("inspireConformance").letter is not None:
+            ws["{}{}".format(col.get("inspireConformance").letter, idx)] = (
+                "conformity:inspire" in md.tags
+            )
 
         # owner
         ws["{}{}".format(col.get("_creator").letter, idx)] = next(
@@ -482,7 +484,7 @@ class Isogeo2xlsx(Workbook):
             )
 
         # bounding box (envelope)
-        if md.envelope and md.envelope.get("bbox"):
+        if md.type != "resource" and md.envelope and md.envelope.get("bbox"):
             coords = md.envelope.get("coordinates")
             if md.envelope.get("type") == "Polygon":
                 bbox = ",\n".join(
@@ -768,7 +770,7 @@ if __name__ == "__main__":
 
     # info to the console
     log_console_handler = logging.StreamHandler()
-    log_console_handler.setLevel(logging.INFO)
+    log_console_handler.setLevel(logging.DEBUG)
     log_console_handler.setFormatter(log_format)
 
     logger.addHandler(log_file_handler)
