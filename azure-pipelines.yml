@@ -31,7 +31,7 @@ stages:
     - job: 'Lint'
       pool:
         vmImage: $(vmImageName)
-    
+
       steps:
       - task: UsePythonVersion@0
         inputs:

@@ -49,7 +49,7 @@ setup(
     install_requires=["isogeo-pysdk>=3.2.5,<3.4", "openpyxl==3.0.*"],
     extras_require={
         "dev": ["black", "python-dotenv"],
-        "test": ["codecov", "coverage", "pytest", "pytest-cov"],
+        "test": ["pytest", "pytest-cov"],
     },
     python_requires=">=3.6, <4",
     # packaging
