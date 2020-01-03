@@ -186,6 +186,14 @@ texinfo_documents = [
     )
 ]
 
+# related documentation
+intersphinx_mapping = {
+    "python": ("https://python.readthedocs.io/en/latest/", None),
+    "isogeo-api-pysdk": ("https://isogeo-api-pysdk.readthedocs.io/en/latest/", None),
+    "requests": ("https://requests.readthedocs.io/en/latest/", None),
+    "oauthlib": ("https://oauthlib.readthedocs.io/en/latest/", None),
+    "requests_oauthlib": ("https://requests-oauthlib.readthedocs.io/en/latest/", None),
+}
 
 # -- Options for Epub output -------------------------------------------------
 
