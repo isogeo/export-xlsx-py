@@ -797,11 +797,12 @@ if __name__ == "__main__":
     isogeo.connect()
 
     # misc
+    print("App used: {}".format(isogeo.app_properties.name))
     METADATA_TEST_FIXTURE_UUID = environ.get("ISOGEO_FIXTURES_METADATA_COMPLETE")
     WORKGROUP_TEST_FIXTURE_UUID = environ.get("ISOGEO_WORKGROUP_TEST_UUID")
 
     search = isogeo.search(
-        whole_results=0,
+        whole_results=1,
         # query="owner:{}".format(WORKGROUP_TEST_FIXTURE_UUID),
         include="all",
     )
@@ -812,7 +813,7 @@ if __name__ == "__main__":
 
     # instanciate th final workbook
     out_workbook = Isogeo2xlsx(
-        lang=isogeo.lang, url_base_edit=isogeo.app_url, url_base_view=isogeo.oc_url
+        lang=isogeo.lang, url_base_edit=isogeo.app_url, url_base_view=isogeo.oc_url,
     )
     # add needed worksheets
     out_workbook.set_worksheets(auto=search.tags.keys(), attributes=1, dashboard=1)
