@@ -56,7 +56,12 @@ class Isogeo2xlsx(Workbook):
     """
 
     def __init__(
-        self, lang: str = "FR", url_base_edit: str = "", url_base_view: str = ""
+        self,
+        lang: str = "FR",
+        url_base_edit: str = "",
+        url_base_view: str = "",
+        # additional
+        **kwargs,
     ):
         """Instanciating the output workbook.
 
