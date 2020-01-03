@@ -57,6 +57,6 @@ IsogeoToXlsx processes a [Isogeo Search as defined in the Isogeo Python SDK](htt
 
     # or save in a memory object
     mem_virtual_workbook = BytesIO()
-    out_workbook.save(attachment_path)
+    out_workbook.save(mem_virtual_workbook)
     ```
 
