@@ -129,6 +129,7 @@ virtualenv/
 # tests
 junit/*
 .pytest_cache/
+try/
 
 # logs
 *.log.*
