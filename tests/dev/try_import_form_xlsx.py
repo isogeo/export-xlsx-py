@@ -27,7 +27,7 @@ from isogeo_pysdk import (
     ApiKeyword,
 )
 
-sys.path.append(str(Path(__file__).parents[1]))
+sys.path.append(str(Path(__file__).parents[2]))
 
 from isogeotoxlsx.i18n import I18N_FR
 from isogeotoxlsx.matrix import VECTOR_COLUMNS
