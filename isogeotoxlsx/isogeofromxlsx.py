@@ -215,7 +215,8 @@ class IsogeoFromxlsx:
         s_date = NamedStyle(name="date")
         self.worksheets_dict = {}
         # LOCALE
-        if lang.lower() == "fr":
+        self.lang = lang
+        if self.lang.lower() == "fr":
             s_date.number_format = "dd/mm/yyyy"
             self.dates_fmt = "DD/MM/YYYY"
             self.locale_fmt = "fr_FR"
@@ -280,7 +281,7 @@ class IsogeoFromxlsx:
                     "keywords": [],
                     "limitations": [],
                     "specifications": [],
-                    "inspireThemes": [],
+                    "inspireThemes": {},
                 }
                 # create Metadata object
                 md = Metadata()
@@ -405,14 +406,14 @@ class IsogeoFromxlsx:
 
     def build_inspireTh(self, inspireTh_value: str):
         li_th = self.build_list(inspireTh_value)
-        li_isogeo_th = []
+        dict_isogeo_th = {}
         for th in li_th:
-            if th in self.dict_inspire:
-                li_isogeo_th.append(self.dict_inspire.get(th))
+            if th in list(self.dict_inspire.keys()):
+                dict_isogeo_th[th] = self.dict_inspire.get(th)
             else:
                 logger.debug("Unexpected INSPIRE theme found in the file : '{}'".format(th))
 
-        return li_isogeo_th
+        return dict_isogeo_th
 
     def build_event(self, event_date: str, kind: str):
         dict_event = Event().to_dict_creation()
