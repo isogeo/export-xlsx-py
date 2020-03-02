@@ -8,7 +8,7 @@
 # submodules
 from .__about__ import __version__  # noqa: F401
 from .isogeo2xlsx import Isogeo2xlsx  # noqa: F401
-from .isogeofromxlsx import *  # noqa: F401
+from .isogeoFromxlsx import IsogeoFromxlsx, dict_inspire_fr, dict_inspire_en  # noqa: F401
 
 # subpackages
 from .matrix import *  # noqa: F401,F403
