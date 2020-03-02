@@ -15,7 +15,21 @@ import logging
 from pathlib import Path
 
 # 3rd party library
-from isogeo_pysdk import IsogeoUtils, IsogeoChecker, Metadata, Keyword, Event, Contact
+from isogeo_pysdk import (
+    IsogeoUtils,
+    IsogeoChecker,
+    Metadata,
+    Keyword,
+    Event,
+    Contact,
+    Directive,
+    Specification,
+    License,
+    Condition,
+    Limitation,
+    LimitationRestrictions,
+    LimitationTypes,
+)
 from openpyxl import load_workbook
 from openpyxl.styles import NamedStyle
 
@@ -82,15 +96,6 @@ tup_nogo_attr = (
     "linkEdit",
     "linkView",
 )
-
-contacts_sheet_dict = {
-    "zipCode": "contact_CP",
-    "name": "contact",
-    "email": "contact_mail",
-    "phone": "contact_tel",
-    "city": "contact_ville",
-    "addressLine1": "contact_adresse",
-}
 
 # dict of inspire keyword ids for INSPIRe themes in french ## TO MOVE to i18n
 dict_inspire_fr = {
@@ -197,6 +202,9 @@ class IsogeoFromxlsx:
         self.li_ignored_md = []
         self.md_read = []
         self.contacts_read = []
+        self.specs_read = []
+        self.licenses_read = []
+        self.directives_read = []
 
         self.worksheets_dict = {}
         # LOCALE
@@ -209,6 +217,9 @@ class IsogeoFromxlsx:
                 "Raster": None,
                 "Services": None,
                 "Contacts": None,
+                self.tr.get("licenses"): None,
+                self.tr.get("specifications"): None,
+                "Directives": None,
             }
 
         else:
@@ -219,6 +230,9 @@ class IsogeoFromxlsx:
                 "Raster": None,
                 "Services": None,
                 "Contacts": None,
+                self.tr.get("licenses"): None,
+                self.tr.get("specifications"): None,
+                "Directives": None,
             }
         # load work sheets
         for sheet in self.worksheets_dict:
@@ -226,21 +240,59 @@ class IsogeoFromxlsx:
                 self.worksheets_dict[sheet] = self.work_book[sheet]
             else:
                 logger.info("No '{}' sheet found in the file".format(sheet))
-
-        if self.worksheets_dict.get("Contacts"):
-            self.retrieve_contacts()
-        else:
-            logger.debug("No contacts to retrieve")
+        # a dict to manage attributes and method used to loaded subressources form sheets
+        self.subress_sheet_dict = {
+            "Contacts": (
+                Contact,
+                {
+                    "zipCode": "contact_CP",
+                    "name": "contact",
+                    "email": "contact_mail",
+                    "phone": "contact_tel",
+                    "city": "contact_ville",
+                    "addressLine1": "contact_adresse",
+                },
+                self.contacts_read,
+            ),
+            self.tr.get("licenses"): (
+                License,
+                {"_id": "licence_uuid", "link": "licence_lien", "name": "licence"},
+                self.licenses_read,
+            ),
+            self.tr.get("specifications"): (
+                Specification,
+                {"_id": "spec_uuid", "name": "spec", "link": "spec_lien"},
+                self.specs_read,
+            ),
+            "Directives": (
+                Directive,
+                {
+                    "_id": "directive_uuid",
+                    "name": "directive",
+                    "description": "directive_description",
+                },
+                self.directives_read,
+            ),
+        }
+        for sheet in self.subress_sheet_dict:
+            if self.worksheets_dict.get(sheet):
+                self.retrieve_sub_ressources(sheet)
+            else:
+                logger.debug("No '{}' to retrieve".format(sheet))
+        logger.info(
+            "{} contacts, {} licenses, {} specifications and {} directives loaded".format(
+                len(self.contacts_read),
+                len(self.licenses_read),
+                len(self.specs_read),
+                len(self.directives_read),
+            )
+        )
 
     def read_file(self):
         """ Simple method to read the xlsx file's content
         """
         self.retrieve_vector_metadatas()
-        logger.info(
-            "{} contacts and {} metadatas read".format(
-                len(self.contacts_read), len(self.md_read)
-            )
-        )
+        logger.info("{} metadatas read".format(len(self.md_read)))
         if len(self.li_ignored_md) > 0:
             logger.info(
                 "{}/{} metadatas ignored because of invalid UUID".format(
@@ -280,18 +332,6 @@ class IsogeoFromxlsx:
                 # create Metadata object
                 md = Metadata()
                 md._id = md_uuid
-                # for attr in Metadata().ATTR_TYPES:
-                #     if attr not in list(attr_index_dict.keys()):
-                #         if Metadata().ATTR_TYPES[attr] == str:
-                #             setattr(md, attr, "***nogo***")
-                #         elif Metadata().ATTR_TYPES[attr] == list:
-                #             pass
-                #         elif Metadata().ATTR_TYPES[attr] == dict:
-                #             pass
-                #         else:
-                #             setattr(md, attr, -1)
-                #     else:
-                #         pass
                 for field in attr_index_dict:
                     # retieve the value taken by the row in this field
                     field_value = row[attr_index_dict.get(field)].value
@@ -299,15 +339,7 @@ class IsogeoFromxlsx:
                         # specifics fields and fields corresponding to attributes that we don't want to change value
                         if field in tup_nogo_attr:
                             pass
-                            # if hasattr(md, field):
-                            #     try:
-                            #         setattr(md, field, "***nogo***")
-                            #     except Exception as e:
-                            #         logger.debug("'{}' attribute can't be set :{}".format(field, e))
-                            # else:
-                            #     logger.debug("'{}' field is not needed".format(field))
-                            #     pass
-                        # for root Metadata attributes that are not filled by the scan and that exist in the frame
+                        # for root Metadata attributes existing in the table
                         elif field in tup_easy_attr:
                             try:
                                 if Metadata().ATTR_TYPES[field] == str:
@@ -367,7 +399,19 @@ class IsogeoFromxlsx:
                                         )
                                     )
                             elif field == "conditions":
-                                md_dict["conditions"] = field_value
+                                md_dict["conditions"] = self.build_md_conditions(
+                                    field_value
+                                )
+
+                            elif field == "limitations":
+                                md_dict["limitations"] = self.build_md_limitations(
+                                    field_value
+                                )
+
+                            elif field == "spécifications":
+                                md_dict["spécifications"] = self.build_md_spec(
+                                    field_value
+                                )
                             else:
                                 pass
                         else:
@@ -378,15 +422,15 @@ class IsogeoFromxlsx:
                 md_dict["md"] = md
                 self.md_read.append(md_dict)
             else:
-                logger.info("'{}' is not a valid UUID")
+                logger.info("'{}' is not a valid UUID".format(md_uuid))
                 self.li_ignored_md.append(md_uuid)
                 continue
         return
 
     def build_index_dict(self, work_sheet, ref_dict: dict):
-        """ Build a dictionnary where keys are Metadata (isogeo-pysdk objet) attributes and values are conresponding column index
+        """ Build a dictionnary where keys are Metadata (isogeo-pysdk objet) attributes 
+        and values are conresponding column index
         """
-
         attr_index_dict = {}
         for i in range(1, work_sheet.max_column + 1):
             # retrieve column header
@@ -410,7 +454,8 @@ class IsogeoFromxlsx:
         return li_values
 
     def build_keywords(self, keywords_value: str):
-        """ Build a list of Keyword instances from a string where each keyword label is delimited with ';'
+        """ Build a list of Keyword instances from a string where each keyword label is 
+        delimited with ';'
         """
         li_kw = self.build_list(keywords_value)
         li_isogeo_kw = []
@@ -423,7 +468,8 @@ class IsogeoFromxlsx:
         return li_isogeo_kw
 
     def build_inspireTh(self, inspireTh_value: str):
-        """ Build a dict of INSPIRE themes from a string where each keyword label is delimited with ';', where keys are theme label and keys are theme uuid into Isogeo database
+        """ Build a dict of INSPIRE themes from a string where each keyword label is 
+        delimited with ';', where keys are theme label and keys are theme uuid into Isogeo database
         """
         li_th = self.build_list(inspireTh_value)
         dict_isogeo_th = {}
@@ -450,11 +496,13 @@ class IsogeoFromxlsx:
         return isogeo_event
 
     def build_md_contacts(self, contacts_value: str):
-        """ Build a list of Contact instances from a string where each contact email is delimited with ';' retrieving theme in the list of Contacts previously loaded if the excel file contains a 'Contacts' work sheet
+        """ Build a list of Contact instances from a string where each contact email is 
+        delimited with ';' retrieving theme in the list of Contacts previously loaded if
+        the excel file contains a 'Contacts' work sheet
         """
-        li_ctcts = self.build_list(contacts_value)
-        li_emails_ctct = []
-        for ctct in li_ctcts:
+        li_ctct_values = self.build_list(contacts_value)
+        li_ctcts = []
+        for ctct in li_ctct_values:
             isogeo_contact = [
                 contact for contact in self.contacts_read if contact.email in ctct
             ]
@@ -462,31 +510,211 @@ class IsogeoFromxlsx:
                 logger.debug(
                     "'{}' contact is not referenced in 'Contacts' sheet".format(ctct)
                 )
+                continue
             else:
-                li_emails_ctct.append(isogeo_contact[0])
+                li_ctcts.append(isogeo_contact[0])
 
-        return li_emails_ctct
+        return li_ctcts
 
-    def retrieve_contacts(self):
-        """ Build a list of Contact instances from 'Contacts' worsheet
+    def build_md_conditions(self, conditions_value: str):
+        """ Build a list of Conditions instances from a string where each condition is
+        delimited with ';' retrieving licenses in the list of Licenses previously loaded if
+        the excel file contains a 'Licenses' work sheet
         """
-        logger.debug("Retrieving contacts from 'Contacts' sheet")
-        ws_contacts = self.worksheets_dict.get("Contacts")
+        li_license_values = self.build_list(conditions_value)
+        li_conditions = []
+        for license_value in li_license_values:
+            isogeo_license = [
+                lic for lic in self.licenses_read if lic.name == license_value
+            ]
+            if len(isogeo_license) == 0:
+                logger.debug(
+                    "'{}' license is not referenced in 'Licenses' sheet".format(
+                        license_value
+                    )
+                )
+                continue
+            else:
+                condition = Condition()
+                condition.license = isogeo_license[0]
+                li_conditions.append(condition)
+
+        return li_conditions
+
+    def build_md_spec(self, specs_value: str):
+        """ Build a list of Specifications instances from a string where each specification is
+        delimited with ';' retrieving specifications uuid in the list of Specifiactions previously loaded if
+        the excel file contains a 'Specifications' work sheet
+        """
+        li_spec_values = self.build_list(specs_value)
+        li_specs = []
+        for spec in li_spec_values:
+            isogeo_spec = [
+                specification
+                for specification in self.specs_read
+                if specification.name == spec
+            ]
+            if len(isogeo_spec) == 0:
+                logger.debug(
+                    "'{}' specification is not referenced in 'Specifications' sheet".format(
+                        spec
+                    )
+                )
+                continue
+            else:
+                li_specs.append(isogeo_spec[0])
+
+        return li_specs
+
+    def build_md_limitations(self, limitations_value: str):
+        """ Build a list of Limitations instances from a string where each limitation is
+        delimited with ';' retrieving directives in the list of Directive previously loaded if
+        the excel file contains a 'Directives' work sheet
+        """
+        li_lim_values = self.build_list(limitations_value)
+        li_lims = []
+        for lim in li_lim_values:
+            lim_items = lim.split("|")
+            if len(lim_items) < 4:
+                logger.debug(
+                    "'{}' does not fill the limitation recommanded structure".format(
+                        lim
+                    )
+                )
+                continue
+            else:
+                lim_dict = Limitation().to_dict_creation()
+
+                lim_type = (
+                    [item for item in lim_items if "type" in item][0]
+                    .replace("type :", "")
+                    .strip()
+                )
+                if self.tr.get(lim_type, lim_type) in LimitationTypes:
+                    lim_dict["type"] = self.tr.get(lim_type)
+                else:
+                    logger.debug("'{}' is not a valid limitation type".format(lim_type))
+                    continue
+
+                lim_restriction = (
+                    [item for item in lim_items if "restriction" in item][0]
+                    .replace("restriction :", "")
+                    .strip()
+                )
+                if (
+                    self.tr.get(lim_restriction, lim_restriction)
+                    in LimitationRestrictions
+                ):
+                    lim_dict["restriction"] = self.tr.get(lim_restriction)
+                else:
+                    logger.debug(
+                        "'{}' is not a valid limitation restriction".format(
+                            lim_restriction
+                        )
+                    )
+                    continue
+
+                lim_directive = (
+                    [item for item in lim_items if "directive" in item][0]
+                    .replace("directive :", "")
+                    .strip()
+                )
+                isogeo_directive = [
+                    directive
+                    for directive in self.directives_read
+                    if directive.name == lim_directive
+                ]
+                if len(isogeo_directive) == 0:
+                    logger.debug(
+                        "'{}' specification is not referenced in 'Specifications' sheet".format(
+                            lim
+                        )
+                    )
+                    continue
+                else:
+                    lim_dict["directive"] = isogeo_directive.name
+                    continue
+                lim_description = (
+                    [item for item in lim_items if "description" in item][0]
+                    .replace("description :", "")
+                    .strip()
+                )
+                lim_dict["description"] = lim_description
+
+                li_lims.append(Limitation(**lim_dict))
+
+        return li_lims
+
+    def retrieve_sub_ressources(self, sub_ressource: str):
+        logger.info(
+            "Retrieving subressource objects from '{}' worksheet".format(sub_ressource)
+        )
+
+        ws_subress = self.worksheets_dict.get(sub_ressource)
+
+        ref_dict = self.subress_sheet_dict.get(sub_ressource)[1]
+
         attr_index_dict = self.build_index_dict(
-            work_sheet=ws_contacts, ref_dict=contacts_sheet_dict
+            work_sheet=ws_subress, ref_dict=ref_dict
         )
         # browsing the frame starting at the second line because we don't nead to read headers
-        for row in ws_contacts.iter_rows(min_row=2):
-            contact_dict = {
-                "zipCode": "",
-                "name": "",
-                "email": "",
-                "phone": "",
-                "city": "",
-                "addressLine1": "",
-            }
+        sdk_object = self.subress_sheet_dict.get(sub_ressource)[0]
+        subress_attr = self.subress_sheet_dict.get(sub_ressource)[2]
+        for row in ws_subress.iter_rows(min_row=2):
+            # try:
+            #     subress_dict = sdk_object().to_dict_creation()
+            # except AttributeError:
+            subress_dict = sdk_object().to_dict()
             for field in attr_index_dict:
                 field_value = row[attr_index_dict.get(field)].value
-                contact_dict[field] = field_value
-            self.contacts_read.append(Contact(**contact_dict))
+                subress_dict[field] = field_value
+            subress_attr.append(sdk_object(**subress_dict))
         return
+
+    # def retrieve_contacts(self):
+    #     """ Build a list of Contact instances from 'Contacts' worsheet
+    #     """
+    #     logger.debug("Retrieving contacts from 'Contacts' sheet")
+    #     ws_contacts = self.worksheets_dict.get("Contacts")
+    #     attr_index_dict = self.build_index_dict(
+    #         work_sheet=ws_contacts, ref_dict=contacts_sheet_dict
+    #     )
+    #     # browsing the frame starting at the second line because we don't nead to read headers
+    #     for row in ws_contacts.iter_rows(min_row=2):
+    #         contact_dict = {
+    #             "zipCode": "",
+    #             "name": "",
+    #             "email": "",
+    #             "phone": "",
+    #             "city": "",
+    #             "addressLine1": "",
+    #         }
+    #         for field in attr_index_dict:
+    #             field_value = row[attr_index_dict.get(field)].value
+    #             contact_dict[field] = field_value
+    #         self.contacts_read.append(Contact(**contact_dict))
+    #     return
+
+    # def retrieve_licenses(self):
+    #     logger.debug("Retrieving licences from 'Licences' sheet")
+    #     ws_licenses = self.worksheets_dict.get(self.tr("licenses"))
+    #     attr_index_dict = self.build_index_dict(
+    #         work_sheet=ws_licenses, ref_dict=licenses_sheet_dict
+    #     )
+    #     return
+
+    # def retrieve_specifications(self):
+    #     logger.debug("Retrieving specifications from 'Specifications' sheet")
+    #     ws_specifications = self.worksheets_dict.get("Specifications")
+    #     attr_index_dict = self.build_index_dict(
+    #         work_sheet=ws_specifications, ref_dict=specifications_sheet_dict
+    #     )
+    #     return
+
+    # def retrieve_directives(self):
+    #     logger.debug("Retrieving directives from 'Directives' sheet")
+    #     ws_directives = self.worksheets_dict.get("Directives")
+    #     attr_index_dict = self.build_index_dict(
+    #         work_sheet=ws_directives, ref_dict=directives_sheet_dict
+    #     )
+    #     return
