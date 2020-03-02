@@ -18,6 +18,8 @@ I18N_EN = {
     "resource": "Ressources",
     "service": "Services",
     "vector": "Vectors",
+    "licences": "Licenses",
+    "specifications": "Specifications",
     # metadata model
     "_created": "MD - Creation date",
     "_creator": "Owner",
