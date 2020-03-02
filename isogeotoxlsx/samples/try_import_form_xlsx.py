@@ -27,7 +27,7 @@ from isogeo_pysdk import (
     ApiKeyword,
 )
 
-sys.path.append(str(Path(__file__).parents[1]))
+sys.path.append(str(Path(__file__).parents[2]))
 from isogeotoxlsx import IsogeoFromxlsx, dict_inspire_fr, dict_inspire_en
 
 checker = IsogeoChecker()
@@ -271,6 +271,11 @@ if len(search.results) == len(xlsx_reader.md_read):
                 else:
                     th = isogeo.keyword.get(keyword_id=inspireTh_uuid)
                     isogeo.keyword.tagging(metadata=isogeo_md, keyword=th)
+
+            # EVENTS
+            logger.info("Update EVENTS")
+            for event in xlsx_events:
+                event = event
 
         else:
             logger.info(
