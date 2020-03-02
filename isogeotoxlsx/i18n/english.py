@@ -75,6 +75,16 @@ I18N_EN = {
     "inspireConformance": "INSPIRE conformance",
     "inspireThemes": "INSPIRE themes",
     "occurrences": "Hits",
+    # limitations
+    "Legal": "legal",
+    "Security": "security",
+    "copyright": "copyright",
+    "intellectual property rights": "intellectualPropertyRights",
+    "license": "license",
+    "other": "other",
+    "patent": "patent",
+    "patent pending": "patentPending",
+    "trademark": "trademark",
 }
 
 # #############################################################################
