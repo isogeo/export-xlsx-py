@@ -501,6 +501,7 @@ class IsogeoFromxlsx:
         the excel file contains a 'Contacts' work sheet
         """
         li_ctct_values = self.build_list(contacts_value)
+        # logger.debug("*=====* {}".format(self.contacts_read))
         li_ctcts = []
         for ctct in li_ctct_values:
             isogeo_contact = [
@@ -667,7 +668,10 @@ class IsogeoFromxlsx:
             subress_dict = sdk_object().to_dict()
             for field in attr_index_dict:
                 field_value = row[attr_index_dict.get(field)].value
-                subress_dict[field] = field_value
+                if field_value:
+                    subress_dict[field] = field_value
+                else:
+                    subress_dict[field] = ""
             subress_attr.append(sdk_object(**subress_dict))
         return
 
