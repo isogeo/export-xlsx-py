@@ -23,14 +23,6 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-Cookbook
-++++++++
-
-.. toctree::
-   :maxdepth: 2
-
-   usage
-
 Package modules
 +++++++++++++++
 
