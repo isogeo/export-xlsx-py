@@ -47,15 +47,19 @@ release = VERSION
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode"]
+extensions = [
+    "recommonmark",
+    "sphinx.ext.autodoc",
+    "sphinx_autodoc_typehints",
+    "sphinx_markdown_tables",
+    "sphinx_rtd_theme",
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
 # The suffix(es) of source filenames.
-# You can specify multiple suffix as a list of string:
-#
-source_suffix = [".rst", ".md"]
+source_suffix = {".rst": "restructuredtext", ".md": "markdown"}
 
 
 # The master toctree document.
@@ -66,22 +70,23 @@ master_doc = "index"
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+# language = None
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = [
     "_build",
-    "*.csv",
+    "*env*",
     "samples/*",
     "Thumbs.db",
     ".DS_Store",
-    "*env*",
     "libs/*",
-    "*.xml",
     "input/*",
     "output/*",
+    "*.csv",
+    "*.xlsx",
+    "*.xml",
 ]
 
 # The name of the Pygments (syntax highlighting) style to use.
@@ -93,7 +98,7 @@ pygments_style = "sphinx"
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "default"
+html_theme = "sphinx_rtd_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -186,11 +191,19 @@ texinfo_documents = [
     )
 ]
 
+# related documentation
+intersphinx_mapping = {
+    "python": ("https://python.readthedocs.io/en/latest/", None),
+    "isogeo-api-pysdk": ("https://isogeo-api-pysdk.readthedocs.io/en/latest/", None),
+    "requests": ("https://requests.readthedocs.io/en/latest/", None),
+    "oauthlib": ("https://oauthlib.readthedocs.io/en/latest/", None),
+    "requests_oauthlib": ("https://requests-oauthlib.readthedocs.io/en/latest/", None),
+}
 
 # -- Options for Epub output -------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = project
+# epub_title = project
 
 # The unique identifier of the text. This can be a ISBN number
 # or the project homepage.
@@ -202,7 +215,7 @@ epub_title = project
 # epub_uid = ''
 
 # A list of files that should not be packed into the epub file.
-epub_exclude_files = ["search.html"]
+# epub_exclude_files = ["search.html"]
 
 
 # -- Extension configuration -------------------------------------------------
@@ -210,7 +223,7 @@ epub_exclude_files = ["search.html"]
 # -- Options for todo extension ----------------------------------------------
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
-todo_include_todos = True
+# todo_include_todos = True
 
 
 # -- Options for Sphinx API doc ----------------------------------------------
