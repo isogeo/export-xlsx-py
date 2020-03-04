@@ -18,6 +18,8 @@ I18N_EN = {
     "resource": "Ressources",
     "service": "Services",
     "vector": "Vectors",
+    "licenses": "Licenses",
+    "specifications": "Specifications",
     # metadata model
     "_created": "MD - Creation date",
     "_creator": "Owner",
@@ -73,6 +75,16 @@ I18N_EN = {
     "inspireConformance": "INSPIRE conformance",
     "inspireThemes": "INSPIRE themes",
     "occurrences": "Hits",
+    # limitations
+    "Legal": "legal",
+    "Security": "security",
+    "copyright": "copyright",
+    "intellectual property rights": "intellectualPropertyRights",
+    "license": "license",
+    "other": "other",
+    "patent": "patent",
+    "patent pending": "patentPending",
+    "trademark": "trademark",
 }
 
 # #############################################################################
