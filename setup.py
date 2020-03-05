@@ -2,7 +2,7 @@
 #!/usr/bin/env python3
 
 """
-    Setup script to package Isogeo PySDK Python module
+    Setup script to package Isogeo to xlsx Python module
 
     see: https://github.com/isogeo/export-xlsx-py/
 """
@@ -17,7 +17,7 @@ import pathlib
 from setuptools import find_packages, setup
 
 # package to get package metadatas
-from isogeo_pysdk import __about__
+from isogeotoxlsx import __about__
 
 # SETUP ######################################################################
 
