@@ -19,7 +19,7 @@ __title__ = "Isogeo MS Excel Exporter"
 __summary__ = "Toolbelt to export metadata from the Isogeo REST API into Microsoft Excel workbooks (.xlsx)."
 __uri__ = "https://pypi.org/project/isogeo-export-xl/"
 
-__version__ = "1.2.4"
+__version__ = "1.2.5"
 
 __author__ = "Isogeo"
 __email__ = "contact@isogeo.com"
