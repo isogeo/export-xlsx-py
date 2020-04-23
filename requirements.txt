@@ -19,7 +19,7 @@ wheel
 
 # Project requirements
 # -----------------------
-isogeo-pysdk>=3.2.5,<3.4
+isogeo-pysdk<=3.4
 openpyxl==3.0.*
 
 # Lint and formatting
