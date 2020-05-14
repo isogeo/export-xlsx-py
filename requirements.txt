@@ -13,35 +13,34 @@
 
 # Common requirements
 # -----------------------
-pip
 setuptools
 wheel
 
 # Project requirements
 # -----------------------
-isogeo-pysdk<=3.4
+isogeo-pysdk>=3.3,<=3.5
 openpyxl==3.0.*
 
 # Lint and formatting
 # -----------------------
-black
-flake8
-pre-commit
-pylint
+black==19.10b0
+flake8==3.7.*
+pre-commit==2.3.*
 
 # Tests
 # -----------------------
-python-dotenv
-pytest
-pytest-cov
+pytest==5.4.*
+pytest-cov==2.8.*
+python-dotenv==0.13.*
 
 # Documentation
 # -----------------------
-sphinx
-sphinx-autodoc-typehints
-sphinx-markdown-tables  # to render markdown tables
-sphinx-rtd-theme
-recommonmark
+sphinx==3.0.*
+sphinx-autodoc-typehints==1.10.*
+sphinx-copybutton==0.2.*
+sphinx-markdown-tables==0.0.14  # to render markdown tables
+sphinx-rtd-theme==0.4.*
+recommonmark==0.6.*
 
 # Packaging
 # -----------------------

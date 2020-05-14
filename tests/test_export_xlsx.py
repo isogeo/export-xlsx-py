@@ -19,10 +19,12 @@
 # Standard library
 import json
 from os import environ, path
+from pathlib import Path
 from tempfile import mkstemp
 import unittest
 
 # 3rd party
+from dotenv import load_dotenv
 from isogeo_pysdk import Metadata
 from openpyxl import Workbook
 
@@ -33,9 +35,8 @@ from isogeotoxlsx import Isogeo2xlsx, Formatter, Stats
 # ######## Globals #################
 # ##################################
 
-# API access
-app_id = environ.get("ISOGEO_API_DEV_ID")
-app_secret = environ.get("ISOGEO_API_DEV_SECRET")
+if Path("dev.env").exists():
+    load_dotenv("dev.env", override=True)
 
 # #############################################################################
 # ########## Classes ###############
