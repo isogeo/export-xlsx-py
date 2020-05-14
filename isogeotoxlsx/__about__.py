@@ -23,7 +23,7 @@ __title__ = "Isogeo MS Excel Exporter"
 __title_clean__ = "".join(e for e in __title__ if e.isalnum())
 __uri__ = "https://github.com/isogeo/export-xlsx-py/"
 
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 __version_info__ = tuple(
     [
         int(num) if num.isdigit() else num
