@@ -14,15 +14,21 @@ __all__ = [
     "__copyright__",
 ]
 
-
-__title__ = "Isogeo MS Excel Exporter"
+__author__ = "Isogeo"
+__copyright__ = "2016 - {0}, {1}".format(date.today().year, __author__)
+__email__ = "contact@isogeo.com"
+__license__ = "GNU Lesser General Public License v3.0"
 __summary__ = "Toolbelt to export metadata from the Isogeo REST API into Microsoft Excel workbooks (.xlsx)."
-__uri__ = "https://pypi.org/project/isogeo-export-xl/"
+__title__ = "Isogeo MS Excel Exporter"
+__title_clean__ = "".join(e for e in __title__ if e.isalnum())
+__uri__ = "https://github.com/isogeo/export-xlsx-py/"
 
 __version__ = "1.3.1"
+__version_info__ = tuple(
+    [
+        int(num) if num.isdigit() else num
+        for num in __version__.replace("-", ".", 1).split(".")
+    ]
+)
 
-__author__ = "Isogeo"
-__email__ = "contact@isogeo.com"
 
-__license__ = "GNU Lesser General Public License v3.0"
-__copyright__ = "2016 - {0}, {1}".format(date.today().year, __author__)
