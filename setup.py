@@ -46,7 +46,7 @@ setup(
         "Source": __about__.__uri__,
     },
     # dependencies
-    install_requires=["isogeo-pysdk<=3.4", "openpyxl==3.0.*"],
+    install_requires=["isogeo-pysdk>=3.3,<=3.5", "openpyxl==3.0.*"],
     extras_require={
         "dev": ["black", "python-dotenv"],
         "test": ["pytest", "pytest-cov"],
