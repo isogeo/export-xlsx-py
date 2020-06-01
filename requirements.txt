@@ -24,7 +24,7 @@ openpyxl==3.0.*
 # Lint and formatting
 # -----------------------
 black==19.10b0
-flake8==3.7.*
+flake8==3.8.*
 pre-commit==2.3.*
 
 # Tests
