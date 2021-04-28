@@ -1,0 +1,14 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: monthly
+    time: "04:00"
+    timezone: Europe/Paris
+  assignees:
+  - simonsampere
+  ignore:
+  - dependency-name: pytest-cov
+    versions:
+    - 2.10.1
