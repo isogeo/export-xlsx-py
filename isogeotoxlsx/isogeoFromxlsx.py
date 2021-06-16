@@ -296,7 +296,7 @@ class IsogeoFromxlsx:
         if len(self.li_ignored_md) > 0:
             logger.info(
                 "{}/{} metadatas ignored because of invalid UUID".format(
-                    len(self.li_ignored_md), len(self.md_read)
+                    len(self.li_ignored_md), len(self.md_read) + len(self.li_ignored_md)
                 )
             )
         else:
